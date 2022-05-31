@@ -1,5 +1,5 @@
 # rust-dragon-fjord-solver
-Solver for the Dragon Fjord A-Puzzle-A-Day re-written in Rust for the backend (tba for the front end).
+Solver for the Dragon Fjord A-Puzzle-A-Day re-written in Rust for the backend and a webapp for the front end.
 
 Uses depth first search (implemented using a loop) to find all solutions for the specified day and month using a "brute force" method. The backend will return a solution set (an array of all possible solutions) to the GUI which is then displayed to the user.
 
