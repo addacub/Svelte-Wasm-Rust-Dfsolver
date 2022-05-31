@@ -2,56 +2,49 @@
 	import {
 		selected_day,
 		selected_month,
-		solution_key,
-		hints,
-		solution,
-		solution_map,
+		number_of_hints,
+		solution_number,
 		solution_set
 	} from '$lib/store';
 	import init, { solve } from 'wasm-dfsolver';
 
-	let solutions: any = $solution_map.get([$selected_day, $selected_month]);
-
 	// Set default number of hints shown
-	hints.set(1);
+	number_of_hints.set(1);
 
 	function solve_click(): void {
-		solution_key.set([$selected_day, $selected_month]);
-
-		// See if solutions has already been found in map
-		if ($solution_map.has($solution_key)) {
-			// Return cached solution
-			solution_set.set($solution_map.get($solution_key));
-		} else {
-			// Get solution and add to hash map
-			let tmp: any = init().then(() => {
-				return solve($selected_day, $selected_month);
-			});
-
-			console.log(tmp);
-			$solution_map.set($solution_key, tmp);
-			console.log($solution_map);
-		}
+		let init_value = init().then(
+			// Success result
+			() => {
+				let tmp_result = solve($selected_day, $selected_month);
+				console.log(tmp_result);
+				solution_set.set(<[[Object]]>tmp_result);
+			},
+			// Failure result
+			() => {
+				console.log('A unspecified failure occured.');
+				return null;
+			}
+		);
 	}
 </script>
 
 <div class="slide-container">
 	<p>Select how many pieces to show:</p>
-	<input bind:value={$hints} type="range" min="0" max="8" step="1" />
-	<output><b>{$hints}</b></output>
+	<input bind:value={$number_of_hints} type="range" min="0" max="8" step="1" />
+	<output><b>{$number_of_hints}</b></output>
 </div>
 
 <div class="spinner-container">
 	<p>Select solution to show:</p>
 	<input
 		type="number"
-		bind:value={$solution}
+		bind:value={$solution_number}
 		min="1"
-		max={$solutions != undefined ? solutions.length : 0}
-		disabled={$solutions != undefined}
+		max={$solution_set != undefined ? $solution_set.length : 0}
+		disabled={$solution_set == undefined}
 	/>
-	{#if $solutions}
-		<p>{$solutions.length} solutions were found.</p>
+	{#if $solution_set != undefined}
+		<p>{$solution_set.length} solutions were found.</p>
 	{:else}
 		<p>No solutions to select from.</p>
 	{/if}
