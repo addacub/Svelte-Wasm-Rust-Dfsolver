@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { element } from 'svelte/internal';
+	import { selected_day, selected_month } from '$lib/store';
 
 	let months: String[] = [
 		'Jan',
@@ -30,9 +30,6 @@
 
 	let website_colors: String[] = ['#19232D', '#EDD3C4', '#C8ADC0', '#748067', '#3E7CB1'];
 
-	let selected_month: number;
-	let selected_day: number;
-
 	function select_month(event: MouseEvent): void {
 		let event_target: EventTarget | null = event.target;
 
@@ -41,7 +38,7 @@
 		}
 
 		let pressed_button: HTMLElement = <HTMLElement>event_target;
-		selected_month = Number(pressed_button.id);
+		selected_month.set(Number(pressed_button.id) + 1);
 		console.log(selected_month);
 	}
 
@@ -53,7 +50,7 @@
 		}
 
 		let pressed_button: Element = <Element>event_target;
-		selected_day = Number(pressed_button.id);
+		selected_day.set(Number(pressed_button.id) - months.length + 1);
 	}
 </script>
 
@@ -61,7 +58,7 @@
 	<div class="month-container">
 		{#each months as month, index}
 			<button
-				class={index == selected_month ? 'pressed' : 'unpressed'}
+				class={index + 1 == $selected_month ? 'pressed' : 'unpressed'}
 				type="button"
 				id={index.toString()}
 				on:click={select_month}
@@ -73,7 +70,7 @@
 	<div class="day-container">
 		{#each Array(31) as _, index}
 			<button
-				class={index + months.length == selected_day ? 'pressed' : 'unpressed'}
+				class={index + 1 == $selected_day ? 'pressed' : 'unpressed'}
 				type="button"
 				id={(index + months.length).toString()}
 				on:click={select_day}
@@ -84,13 +81,13 @@
 	</div>
 </div>
 <p>
-	The month selected is: {selected_month != undefined ? months[selected_month] : 'None selected'}
+	The month selected is: {$selected_month != undefined
+		? months[$selected_month - 1]
+		: 'None selected'}
 </p>
 <br />
 <p>
-	The day selected is: {selected_day != undefined
-		? selected_day - months.length + 1
-		: 'None selected'}
+	The day selected is: {$selected_day != undefined ? $selected_day : 'None selected'}
 </p>
 
 <!-- <svg width="300" height="200" display="inline-block">
