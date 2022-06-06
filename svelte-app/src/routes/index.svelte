@@ -3,8 +3,8 @@
 </script>
 
 <script lang="ts">
-	import Calendar from '$lib/Calendar.svelte';
-	import Menu from '$lib/Menu.svelte';
+	import Calendar from '$lib/solver/Calendar.svelte';
+	import Menu from '$lib/solver/Menu.svelte';
 </script>
 
 <svelte:head>
@@ -22,14 +22,6 @@
 </section>
 
 <style>
-	/* section {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		flex: 2;
-	} */
-
 	.row {
 		display: flex;
 	}
@@ -39,11 +31,11 @@
 	}
 
 	.left {
-		width: 25%;
-		margin-right: 10rem;
+		width: 30%;
+		margin-right: 2rem;
 	}
 
 	.right {
-		width: 75%;
+		width: 70%;
 	}
 </style>
