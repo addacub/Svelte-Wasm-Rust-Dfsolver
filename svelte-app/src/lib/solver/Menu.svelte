@@ -14,21 +14,24 @@
 	import { shuffle } from '$lib/solver/utils';
 	import { Circle2 } from 'svelte-loading-spinners';
 
+	// Controls when the spinner loader is shown
 	let processing = false;
+	// Controls when the solve_click function can execute
+	let pressed = false;
 
 	function solve_click(): void {
-		if (processing == true) {
+		if (pressed == true) {
+			console.debug('Entered guard statement: ' + processing);
 			return;
 		}
 
 		processing = true;
-		console.debug('Entering function: ' + processing);
+		pressed = true;
 
 		// let start_time = new Date().getMilliseconds();
 		init().then(
 			// Success result
 			() => {
-				console.debug('Starting processing: ' + processing);
 				solution_set.set(
 					<
 						{
@@ -51,7 +54,7 @@
 
 				set_selected_solution();
 				processing = false;
-				console.debug('Finished processing: ' + processing);
+				setTimeout(() => (pressed = false), 50);
 			},
 			// Failure result
 			() => {
@@ -59,8 +62,6 @@
 				return null;
 			}
 		);
-
-		console.debug('Exiting function: ' + processing);
 	}
 
 	function set_selected_solution(): void {
@@ -102,7 +103,7 @@
 	<div class="column left padded">
 		<button
 			type="button"
-			disabled={$selected_day == undefined || $selected_month == undefined || processing}
+			disabled={$selected_day == undefined || $selected_month == undefined || pressed}
 			on:click={solve_click}
 			style="display: inline; margin-right: 1rem"
 		>

@@ -1,6 +1,6 @@
 use std::{fs::File, io::Write, ops::Range, path::PathBuf, time::SystemTime};
 
-use dfsolver::puzzle::solver::{SolverMultiThreaded, SolverSingleThreaded};
+use wasm_dfsolver::puzzle::solver::{SolverMultiThreaded, SolverSingleThreaded};
 
 #[test]
 #[ignore]

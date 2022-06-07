@@ -1,6 +1,6 @@
 use std::time::SystemTime;
 
-use dfsolver::puzzle::{
+use wasm_dfsolver::puzzle::{
     piece::PieceBoardPosition,
     solver::{SolverMultiThreaded, SolverSingleThreaded},
 };
