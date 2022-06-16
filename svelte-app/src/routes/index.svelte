@@ -3,39 +3,16 @@
 </script>
 
 <script lang="ts">
-	import Calendar from '$lib/solver/Calendar.svelte';
-	import Menu from '$lib/solver/Menu.svelte';
 </script>
 
 <svelte:head>
-	<title>Home</title>
-	<meta name="description" content="Svelte demo app" />
+	<title>A Puzzle A Day</title>
+	<meta name="description" content="A Puzzle A Day Game and Solver" />
 </svelte:head>
 
 <section class="row">
-	<div class="column left">
-		<Menu />
-	</div>
-	<div class="column right">
-		<Calendar />
-	</div>
+	<p>This is where the game will live</p>
 </section>
 
 <style>
-	.row {
-		display: flex;
-	}
-
-	.column {
-		float: left;
-	}
-
-	.left {
-		width: 30%;
-		margin-right: 2rem;
-	}
-
-	.right {
-		width: 70%;
-	}
 </style>
