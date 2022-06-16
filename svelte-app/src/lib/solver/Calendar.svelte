@@ -7,7 +7,8 @@
 		selected_month,
 		number_of_hints,
 		day_solved_for,
-		month_solved_for
+		month_solved_for,
+		hide_text
 	} from '$lib/solver/store';
 	import {} from '$lib/solver/store';
 	import { get_board_index } from '$lib/solver/utils';
@@ -32,6 +33,7 @@
 	// associated with the colour group is added
 	// to the button to change its background colour
 	let button_colour_groups: number[][] = [[], [], [], [], [], [], [], []];
+	let covered_buttons: number[] = [];
 
 	let website_colors: String[] = ['#19232D', '#EDD3C4', '#C8ADC0', '#748067', '#3E7CB1'];
 
@@ -44,7 +46,6 @@
 
 		let pressed_button: HTMLElement = <HTMLElement>event_target;
 		selected_month.set(Number(pressed_button.id) + 1);
-		console.log(selected_month);
 	}
 
 	function select_day(event: MouseEvent): void {
@@ -75,8 +76,10 @@
 	// Clears the board
 	function clear_peices(): void {
 		button_colour_groups.forEach((button_colour_group) => (button_colour_group.length = 0));
+		covered_buttons.length = 0;
 		// Assignment required for svelte to know vairable has changed and to be updated
 		button_colour_groups = button_colour_groups;
+		covered_buttons = covered_buttons;
 	}
 
 	// Reactive declarations: whenever the value of selected_solution or number of hints changes
@@ -111,12 +114,29 @@
 						Math.trunc(index / piece.orientation.shape.cols) * 7;
 
 					button_colour_groups[hint].push(button_ID);
+					covered_buttons.push(button_ID);
 				}
 			});
 		}
 
 		// Assignment required for svelte to know vairable has changed and to be updated
 		button_colour_groups = button_colour_groups;
+		covered_buttons = covered_buttons;
+		reactive_flag = true;
+	}
+
+	// Purposely uses assignment to trigger function calls
+	let reactive_flag: boolean = true;
+
+	function get_colour(board_position: number, reactive_flag: boolean): string {
+		for (let i: number = 0; i < button_colour_groups.length; i++) {
+			if (button_colour_groups[i].includes(board_position)) {
+				console.log('Inside get colour function');
+				return $colour_classes[i];
+			}
+		}
+
+		return '';
 	}
 </script>
 
@@ -147,7 +167,7 @@
 				on:click={select_month}
 				id={index.toString()}
 			>
-				{month}
+				{covered_buttons.includes(index + Math.trunc(index / 6)) && $hide_text ? '' : month}
 			</button>
 		{/each}
 	</div>
@@ -177,22 +197,16 @@
 				on:click={select_day}
 				id={(index + months.length).toString()}
 			>
-				{index + 1}
+				{covered_buttons.includes(index + months.length + 2) && $hide_text ? '' : index + 1}
 			</button>
 		{/each}
 	</div>
 </div>
-<p>
-	The month selected is: {$selected_month != undefined
-		? months[$selected_month - 1]
-		: 'None selected'}
-</p>
-<br />
-<p>
-	The day selected is: {$selected_day != undefined ? $selected_day : 'None selected'}
-</p>
 
 <style>
+	p {
+		font-size: 1.5rem;
+	}
 	.calendar {
 		padding-top: 5rem;
 	}

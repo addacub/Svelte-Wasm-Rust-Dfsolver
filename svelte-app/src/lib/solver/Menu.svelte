@@ -8,7 +8,8 @@
 		solution_number,
 		selected_solution,
 		solution_set,
-		colour_classes
+		colour_classes,
+		hide_text
 	} from '$lib/solver/store';
 	import init, { solve } from 'wasm-dfsolver';
 	import { shuffle } from '$lib/solver/utils';
@@ -16,17 +17,9 @@
 
 	// Controls when the spinner loader is shown
 	let processing = false;
-	// Controls when the solve_click function can execute
-	let pressed = false;
 
 	function solve_click(): void {
-		if (pressed == true) {
-			console.debug('Entered guard statement: ' + processing);
-			return;
-		}
-
 		processing = true;
-		pressed = true;
 
 		// let start_time = new Date().getMilliseconds();
 		init().then(
@@ -53,8 +46,7 @@
 				}
 
 				set_selected_solution();
-				processing = false;
-				setTimeout(() => (pressed = false), 50);
+				setTimeout(() => (processing = false), 0);
 			},
 			// Failure result
 			() => {
@@ -101,9 +93,17 @@
 </section>
 <section class="row">
 	<div class="column left padded">
+		<p>Cover dates when piece is revealed?</p>
+	</div>
+	<div class="column right padded">
+		<input type="checkbox" bind:checked={$hide_text} style="top: 50%; position:relative" />
+	</div>
+</section>
+<section class="row">
+	<div class="column left padded">
 		<button
 			type="button"
-			disabled={$selected_day == undefined || $selected_month == undefined || pressed}
+			disabled={$selected_day == undefined || $selected_month == undefined || processing}
 			on:click={solve_click}
 			style="display: inline; margin-right: 1rem"
 		>
