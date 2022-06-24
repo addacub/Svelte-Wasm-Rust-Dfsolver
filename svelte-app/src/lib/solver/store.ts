@@ -1,5 +1,6 @@
 import { writable, type Writable } from 'svelte/store';
 
+// Variables used for the solver
 export let selected_day: Writable<number> = writable();
 export let selected_month: Writable<number> = writable();
 export let day_solved_for: Writable<number> = writable();
