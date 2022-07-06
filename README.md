@@ -1,5 +1,7 @@
 # Svelte-Wasm-Rust-Dfsolver
-Solver for DragonFjord's A-Puzzle-A-Day (https://www.dragonfjord.com/) re-written in Rust, which is compiled to WASM and called by a svelte webapp.
+WIP: work in progress
+
+A solver for DragonFjord's A-Puzzle-A-Day (https://www.dragonfjord.com/) written in Rust, which is compiled to WASM and called by a svelte webapp.
 
 Uses depth first search (implemented using a loop) to find all solutions for the specified day and month using a "brute force" method. The "backend" will return a solution set (an array of all possible solutions) to the GUI which is a svelte-kit webapp to disaply the solutions to the user.
 
