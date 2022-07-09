@@ -1,8 +1,10 @@
 import { writable, type Writable } from 'svelte/store';
 
 // Variables used for the drag and drop game
-export let draw_scale: Writable<number> = writable(100);
-export const LINEWIDTH: Writable<number> = writable(0.05);
+export let drawScale: Writable<number> = writable(100);
+export let lineWidth: Writable<number> = writable(0.05);
+export let scaleFactor: Writable<number> = writable(0.9);
+
 
 /**
  * #0dc566 = hsl(149, 88, 41)
@@ -38,8 +40,9 @@ export class Point {
         return this.y;
     }
 
-
 }
+
+export let mousePosition: Writable<Point> = writable(new Point(0, 0));
 
 /**
  * Returns a point rotated around a provided point at the specified angle.
@@ -69,7 +72,7 @@ export function rotationAboutPoint(position: Point, origin: Point, theta: number
 
 /**
  * Rotates and translates the canvas by the angle specified
- * @param theta the angle to rotate the canvas by
+ * @param theta the rotation angle, clockwise in radians
  */
  export function translateAndRotate(ctx: CanvasRenderingContext2D, centre: Point, theta: number): void {
     ctx.translate(centre.getX(), centre.getY());
