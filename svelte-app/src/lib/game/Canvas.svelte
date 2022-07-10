@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount, setContext, tick } from 'svelte';
-	import { Point, mousePosition, scaleFactor } from './store';
+	import { Point, mousePosition, drawScale } from './store';
 
 	let canvas: HTMLCanvasElement;
 
@@ -34,9 +34,6 @@
 
 	function getMousePosition(event: MouseEvent): Point {
 		let rect = canvas.getBoundingClientRect();
-		// let x = (event.clientX - rect.left) / $scaleFactor;
-		// let y = (event.clientY - rect.top) / $scaleFactor;
-
 		let x = event.clientX - rect.left;
 		let y = event.clientY - rect.top;
 
@@ -46,12 +43,12 @@
 	}
 
 	function drawBoard(ctx: CanvasRenderingContext2D, p: number): void {
-		for (let x = 0; x <= canvas.width; x += 100) {
+		for (let x = 0; x <= canvas.width; x += $drawScale) {
 			ctx.moveTo(x + p, p);
 			ctx.lineTo(x + p, canvas.height + p);
 		}
 
-		for (let y = 0; y <= canvas.height; y += 100) {
+		for (let y = 0; y <= canvas.height; y += $drawScale) {
 			ctx.moveTo(p, y + p);
 			ctx.lineTo(canvas.width, y + p);
 		}
@@ -75,11 +72,19 @@
 		}
 	});
 
+	function resizeCanvas(): void {
+		canvas.width = width;
+		canvas.height = height;
+
+		console.log(`Canvas dimensions: width=${width} \t height=${height}`);
+	}
+
 	onMount(async () => {
 		await tick();
 		const ctx = canvas.getContext('2d')!;
 
 		function update() {
+			resizeCanvas();
 			ctx.fillStyle = 'white';
 			ctx?.rect(0, 0, width, height);
 			ctx?.save();

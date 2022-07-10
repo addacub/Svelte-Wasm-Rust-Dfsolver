@@ -92,7 +92,7 @@
 		ctx.stroke();
 
 		// Add canvas position on piece
-		ctx.font = '30px Arial';
+		ctx.font = '20px Arial';
 		ctx.fillStyle = 'black';
 		ctx.fillText(
 			`x: ${position.getX().toPrecision(5)}\ty: ${position.getY().toPrecision(5)}`,
@@ -121,8 +121,8 @@
 			theta
 		);
 
-		console.log(`boundary point 1: x = ${point1.getX()}\ty = ${point1.getY()}`);
-		console.log(`boundary point 2: x = ${point2.getX()}\ty = ${point2.getY()}`);
+		// console.log(`boundary point 1: x = ${point1.getX()}\ty = ${point1.getY()}`);
+		// console.log(`boundary point 2: x = ${point2.getX()}\ty = ${point2.getY()}`);
 
 		let xMin: number;
 		let xMax: number;

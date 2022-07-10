@@ -1,9 +1,9 @@
 import { writable, type Writable } from 'svelte/store';
 
 // Variables used for the drag and drop game
-export let drawScale: Writable<number> = writable(100);
+export let drawScale: Writable<number> = writable(60);
 export let lineWidth: Writable<number> = writable(0.05);
-export let scaleFactor: Writable<number> = writable(0.9);
+export let scaleFactor: Writable<number> = writable(0.8);
 
 
 /**
