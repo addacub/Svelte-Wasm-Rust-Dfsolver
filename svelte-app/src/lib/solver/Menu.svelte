@@ -1,3 +1,7 @@
+<script context="module" lang="ts">
+	export const prerender = true;
+</script>
+
 <script lang="ts">
 	import {
 		selected_day,
@@ -9,51 +13,42 @@
 		selected_solution,
 		solution_set,
 		colour_classes,
-		hide_text
+		hide_text,
+		is_valid_solution
 	} from '$lib/solver/store';
-	import init, { solve } from 'wasm-dfsolver';
+	import { solve } from 'wasm-dfsolver';
 	import { shuffle } from '$lib/solver/utils';
 	import { Circle2 } from 'svelte-loading-spinners';
 
-	// Controls when the spinner loader is shown
 	let processing = false;
 
 	function solve_click(): void {
 		processing = true;
 
-		// let start_time = new Date().getMilliseconds();
-		init().then(
-			// Success result
-			() => {
-				solution_set.set(
-					<
-						{
-							name: String;
-							board_position: [number, number];
-							orientation: { data: number[]; shape: { cols: number; rows: number } };
-						}[][]
-					>solve($selected_day, $selected_month)
-				);
-				// let duration = start_time - new Date().getMilliseconds();
-				// console.debug(duration);
+		// Send to back of event loop queue to let GUI catch up with state
+		setTimeout(() => {
+			solution_set.set(
+				<
+					{
+						name: String;
+						board_position: [number, number];
+						orientation: { data: number[]; shape: { cols: number; rows: number } };
+					}[][]
+				>solve($selected_day, $selected_month)
+			);
 
-				day_solved_for.set($selected_day);
-				month_solved_for.set($selected_month);
+			day_solved_for.set($selected_day);
+			month_solved_for.set($selected_month);
+			is_valid_solution.set(true);
 
-				// Adjust solution number if larger than new solution set
-				if ($solution_number > $solution_set.length) {
-					solution_number.set($solution_set.length);
-				}
-
-				set_selected_solution();
-				setTimeout(() => (processing = false), 0);
-			},
-			// Failure result
-			() => {
-				console.log('A unspecified failure occured.');
-				return null;
+			// Adjust solution number if larger than new solution set
+			if ($solution_number > $solution_set.length) {
+				solution_number.set($solution_set.length);
 			}
-		);
+
+			set_selected_solution();
+			setTimeout(() => (processing = false), 0);
+		}, 0);
 	}
 
 	function set_selected_solution(): void {
