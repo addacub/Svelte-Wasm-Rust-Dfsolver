@@ -46,5 +46,7 @@
 	/>
 </Canvas>
 
+<slot />
+
 <style>
 </style>

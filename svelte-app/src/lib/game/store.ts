@@ -24,8 +24,8 @@ export let scaleFactor: Writable<number> = writable(0.8);
  */
 export class Point {
     
-    private x: number;
-    private y: number;
+    protected x: number;
+    protected y: number;
 
     public constructor(x: number, y: number) {
         this.x = x;

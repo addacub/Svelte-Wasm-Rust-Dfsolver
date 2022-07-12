@@ -11,6 +11,9 @@
 	const dragFunctions: Function[] = [];
 	const selectFunctions: Function[] = [];
 	const dropFunctions: Function[] = [];
+	const rotateFunctions: Function[] = [];
+	const flipFunctions: Function[] = [];
+	const resetFunctions: Function[] = [];
 
 	function mouseDown(event: MouseEvent) {
 		let cursorPosition: Point = getMousePosition(event);
@@ -42,6 +45,18 @@
 		return new Point(x, y);
 	}
 
+	function rotatePiece(sign: number): void {
+		rotateFunctions.forEach((rotateFn) => {
+			rotateFn(sign);
+		});
+	}
+
+	function resetPieces(): void {
+		resetFunctions.forEach((resetFn) => {
+			resetFn();
+		});
+	}
+
 	function drawBoard(ctx: CanvasRenderingContext2D, p: number): void {
 		for (let x = 0; x <= canvas.width; x += $drawScale) {
 			ctx.moveTo(x + p, p);
@@ -58,25 +73,45 @@
 	}
 
 	setContext('canvas', {
-		register(drawFn: Function, selectFn: Function, dragFn: Function, dropFn: Function) {
+		register(
+			drawFn: Function,
+			selectFn: Function,
+			dragFn: Function,
+			dropFn: Function,
+			rotateFn: Function,
+			flipFn: Function,
+			resetFn: Function
+		) {
 			drawFunctions.push(drawFn);
 			selectFunctions.push(selectFn);
 			dragFunctions.push(dragFn);
 			dropFunctions.push(dropFn);
+			rotateFunctions.push(rotateFn);
+			flipFunctions.push(flipFn);
+			resetFunctions.push(resetFn);
 		},
-		unregister(drawFn: Function, selectFn: Function, dragFn: Function, dropFn: Function) {
+		unregister(
+			drawFn: Function,
+			selectFn: Function,
+			dragFn: Function,
+			dropFn: Function,
+			rotateFn: Function,
+			flipFn: Function,
+			resetFn: Function
+		) {
 			drawFunctions.splice(drawFunctions.indexOf(drawFn), 1);
 			selectFunctions.splice(selectFunctions.indexOf(selectFn), 1);
 			dragFunctions.splice(dragFunctions.indexOf(dragFn), 1);
 			dropFunctions.splice(dropFunctions.indexOf(dropFn), 1);
+			rotateFunctions.splice(rotateFunctions.indexOf(rotateFn), 1);
+			flipFunctions.splice(flipFunctions.indexOf(flipFn), 1);
+			resetFunctions.splice(resetFunctions.indexOf(resetFn), 1);
 		}
 	});
 
 	function resizeCanvas(): void {
 		canvas.width = width;
 		canvas.height = height;
-
-		console.log(`Canvas dimensions: width=${width} \t height=${height}`);
 	}
 
 	onMount(async () => {
@@ -120,4 +155,34 @@
 	style="boarder:1px solid #000000"
 />
 
+<div>
+	<button on:click={() => rotatePiece(-1)}>&cularr;</button>
+	<button on:click={() => rotatePiece(1)}>&curarr;</button>
+	<button>&rarrlp;</button>
+	<button on:click={() => resetPieces()}>&#10227;</button>
+</div>
+
 <slot />
+
+<style>
+	div {
+		padding-top: 1rem;
+	}
+
+	button {
+		background-color: #c8adc0;
+		width: 2em;
+		height: 2em;
+		font-size: xx-large;
+		border-width: 5px;
+		border-color: white rgb(110, 110, 110) rgb(110, 110, 110) white;
+	}
+
+	button:active {
+		border-color: rgb(110, 110, 110) white white rgb(110, 110, 110);
+	}
+
+	button:hover {
+		background-color: hsl(318, 20%, 50%);
+	}
+</style>

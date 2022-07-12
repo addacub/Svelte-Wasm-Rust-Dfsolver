@@ -1,6 +1,8 @@
 <script lang="ts">
 	// Controls 2x3 No Hole piece
 	import { getContext, onMount } from 'svelte';
+	import { tweened, type Tweened } from 'svelte/motion';
+	import { linear, cubicOut } from 'svelte/easing';
 	import {
 		drawScale,
 		lineWidth,
@@ -17,17 +19,32 @@
 	export let svgPath: string;
 	export let hsl: [number, number, number];
 
-	let isSelected: boolean = false;
-
 	let fill: string = `hsl(${hsl[0]}, ${hsl[1]}%, ${hsl[2]}%)`;
 	let stroke: string = `hsl(${hsl[0]}, ${hsl[1]}%, ${getStrokeLightness(hsl[2])}%)`;
 
-	// the rotation angle, clockwise in radians
-	let theta: number = 0; // degrees
+	let isSelected: boolean = false;
+	let isDragging: boolean = false;
+
 	let centre: Point;
 	let positionOffset: Point;
+	// the rotation angle, clockwise in radians
+	let theta: number = 0; // degrees
+	const originalState: [position: Point, theta: number] = [position, theta];
+
+	let tweenedTheta: Tweened<number> = tweened(theta, { duration: 350, easing: linear });
+	let tweenedPosition: Tweened<Point> = tweened(position, { duration: 1000, easing: cubicOut });
 
 	const { register, unregister } = getContext('canvas');
+
+	onMount(() => {
+		updateCentrePosition();
+
+		register(draw, select, drag, drop, rotate, flip, reset);
+
+		return () => {
+			unregister(draw, select, drag, drop, rotate, flip, reset);
+		};
+	});
 
 	/**
 	 * Re-calculates the centre position and sets the centre variable
@@ -45,6 +62,21 @@
 	 */
 	function getMoveTo(): string {
 		return 'M' + position.getX() + ',' + position.getY();
+	}
+
+	/**
+	 * Draws the puzzle piece and applys the required transformations to the canvas to do so
+	 * @param ctx the canvas context which to draw the path on
+	 */
+	function draw(ctx: CanvasRenderingContext2D) {
+		let theta: number = $tweenedTheta;
+		if (!isDragging) {
+			position = new Point($tweenedPosition.x, $tweenedPosition.y);
+		}
+		updateCentrePosition();
+		translateAndRotate(ctx, centre, theta);
+		drawPiece(ctx);
+		ctx.restore();
 	}
 
 	/**
@@ -89,6 +121,11 @@
 			);
 		}
 
+		// Add highlight if piece is selected
+		if (isSelected) {
+			ctx.strokeStyle = 'rgb(253, 252, 151)';
+		}
+
 		ctx.stroke();
 
 		// Add canvas position on piece
@@ -99,13 +136,6 @@
 			position.getX(),
 			centre.getY()
 		);
-	}
-
-	function drawCircle(ctx: CanvasRenderingContext2D, position: Point, fill: string): void {
-		ctx.beginPath();
-		ctx.fillStyle = fill;
-		ctx.arc(position.getX(), position.getY(), 10, 0, 2 * Math.PI, true);
-		ctx.fill();
 	}
 
 	/**
@@ -120,9 +150,6 @@
 			centre,
 			theta
 		);
-
-		// console.log(`boundary point 1: x = ${point1.getX()}\ty = ${point1.getY()}`);
-		// console.log(`boundary point 2: x = ${point2.getX()}\ty = ${point2.getY()}`);
 
 		let xMin: number;
 		let xMax: number;
@@ -158,33 +185,19 @@
 		}
 	}
 
-	onMount(() => {
-		updateCentrePosition();
-
-		register(draw, select, drag, drop);
-
-		return () => {
-			unregister(draw, select, drag, drop);
-		};
-	});
-
-	function draw(ctx: CanvasRenderingContext2D) {
-		// drawPiece(ctx);
-		// drawCircle(ctx, position, 'black');
-
-		translateAndRotate(ctx, centre, theta);
-		drawPiece(ctx);
-		translateAndRotate(ctx, centre, -theta);
-
-		let rotPoints = rotationAboutPoint(position, centre, theta);
-
-		// drawCircle(ctx, rotPoints, 'purple');
-		// drawCircle(ctx, new Point(0, 0), 'red');
-	}
-
+	/**
+	 * Determines if the mousedown event occured while the mouse was
+	 * on the puzzle piece.
+	 * @param cursorPosition A Point which contains the relative canvas coordinates of
+	 * the cursor position.
+	 */
 	function select(cursorPosition: Point): void {
+		// Reset if click occurs on canvas
+		isSelected = false;
+
 		if (isCursorWithinPieceBoundary(cursorPosition, theta)) {
 			isSelected = true;
+			isDragging = true;
 			positionOffset = new Point(
 				position.getX() - cursorPosition.getX(),
 				position.getY() - cursorPosition.getY()
@@ -192,17 +205,52 @@
 		}
 	}
 
+	/**
+	 * Drags the selected puzzle piece to where the
+	 * user takes the mouse.
+	 * @param cursorPosition A Point which contains the relative canvas coordinates of
+	 * the cursor position.
+	 */
 	function drag(cursorPosition: Point): void {
-		if (isSelected) {
+		if (isDragging) {
 			position = new Point(
 				cursorPosition.getX() + positionOffset.getX(),
 				cursorPosition.getY() + positionOffset.getY()
 			);
 			updateCentrePosition();
+			tweenedPosition.set(position, { duration: 0 });
 		}
 	}
 
+	/**
+	 * If is partly on a board position, will cause puzzle piece
+	 * to snap to it. Otherwise will stay where the user released
+	 * the mouse.
+	 */
 	function drop(): void {
-		isSelected = false;
+		isDragging = false;
+	}
+
+	/**
+	 * Rotates the puzzle piece by 90 degrees
+	 * @param sign Indicates the direction of rotation.
+	 */
+	function rotate(sign: number): void {
+		if (isSelected) {
+			theta = theta + 90 * sign;
+			tweenedTheta.set(theta);
+		}
+	}
+
+	function flip(): void {}
+
+	/**
+	 * Resets the puzzle pieces to their original positions
+	 * around the board.
+	 */
+	function reset(): void {
+		[position, theta] = originalState;
+		tweenedTheta.set(theta);
+		tweenedPosition.set(position);
 	}
 </script>
