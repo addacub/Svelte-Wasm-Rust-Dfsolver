@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount, setContext, tick } from 'svelte';
-	import { Point, mousePosition, drawScale } from './store';
+	import { Point, mousePosition, drawScale, isSelectable } from './store';
 
 	let canvas: HTMLCanvasElement;
 
@@ -16,6 +16,7 @@
 	const resetFunctions: Function[] = [];
 
 	function mouseDown(event: MouseEvent) {
+		isSelectable.set(true);
 		let cursorPosition: Point = getMousePosition(event);
 		selectFunctions.forEach((selectFn) => {
 			selectFn(cursorPosition);
@@ -51,10 +52,36 @@
 		});
 	}
 
+	function flipPiece(): void {
+		flipFunctions.forEach((flipFn) => {
+			flipFn();
+		});
+	}
+
 	function resetPieces(): void {
 		resetFunctions.forEach((resetFn) => {
 			resetFn();
 		});
+	}
+
+	function handleKeydown(event: KeyboardEvent): void {
+		let key: string = event.key;
+
+		if (key === 'w' || key === 's') {
+			flipPiece();
+		}
+
+		if (key === 'a') {
+			rotatePiece(-1);
+		}
+
+		if (key === 'd') {
+			rotatePiece(1);
+		}
+
+		if (key === 'Escape') {
+			resetPieces();
+		}
 	}
 
 	function drawBoard(ctx: CanvasRenderingContext2D, p: number): void {
@@ -147,6 +174,8 @@
 	});
 </script>
 
+<svelte:window on:keydown={handleKeydown} />
+
 <canvas
 	bind:this={canvas}
 	on:mousedown={mouseDown}
@@ -156,10 +185,10 @@
 />
 
 <div>
-	<button on:click={() => rotatePiece(-1)}>&cularr;</button>
-	<button on:click={() => rotatePiece(1)}>&curarr;</button>
-	<button>&rarrlp;</button>
-	<button on:click={() => resetPieces()}>&#10227;</button>
+	<button id="rotateAnticlockwise" on:click={() => rotatePiece(-1)}>&cularr;</button>
+	<button id="rotateClockwise" on:click={() => rotatePiece(1)}>&curarr;</button>
+	<button id="flip" on:click={() => flipPiece()}>&rarrlp;</button>
+	<button id="reset" on:click={() => resetPieces()}>&#10227;</button>
 </div>
 
 <slot />

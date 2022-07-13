@@ -4,6 +4,7 @@ import { writable, type Writable } from 'svelte/store';
 export let drawScale: Writable<number> = writable(60);
 export let lineWidth: Writable<number> = writable(0.05);
 export let scaleFactor: Writable<number> = writable(0.8);
+export let isSelectable: Writable<boolean> = writable(true)
 
 
 /**
@@ -24,8 +25,8 @@ export let scaleFactor: Writable<number> = writable(0.8);
  */
 export class Point {
     
-    protected x: number;
-    protected y: number;
+    private x: number;
+    private y: number;
 
     public constructor(x: number, y: number) {
         this.x = x;
@@ -43,42 +44,6 @@ export class Point {
 }
 
 export let mousePosition: Writable<Point> = writable(new Point(0, 0));
-
-/**
- * Returns a point rotated around a provided point at the specified angle.
- * @param position The cartesian point to be rotated
- * @param origin The point which to rotate around
- * @param theta The angle of rotation in degrees as per standard unit circle. 
- * @returns 
- */
-export function rotationAboutPoint(position: Point, origin: Point, theta: number): Point {
-    // Convert from degrees to radians
-    theta = (Math.PI / 180) * theta;
-    
-    // Translate so point of rotation is the origin
-    let xTranslated = position.getX() - origin.getX();
-    let yTranslated = position.getY() - origin.getY();
-    
-    // Rotate
-    let xRotated = xTranslated * Math.cos(theta) - yTranslated * Math.sin(theta);
-    let yRotated = yTranslated * Math.cos(theta) + xTranslated * Math.sin(theta);
-
-    // Undo translation
-    let x = xRotated + origin.getX();
-    let y = yRotated + origin.getY();
-
-    return new Point(x, y);
-}
-
-/**
- * Rotates and translates the canvas by the angle specified
- * @param theta the rotation angle, clockwise in radians
- */
- export function translateAndRotate(ctx: CanvasRenderingContext2D, centre: Point, theta: number): void {
-    ctx.translate(centre.getX(), centre.getY());
-    ctx.rotate((Math.PI / 180) * theta);
-    ctx.translate(-centre.getX(), -centre.getY());
-}
 
 /**
  * Automatically calculates the stroke lightness based on input lightness

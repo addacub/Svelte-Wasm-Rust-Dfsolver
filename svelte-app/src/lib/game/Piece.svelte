@@ -2,15 +2,8 @@
 	// Controls 2x3 No Hole piece
 	import { getContext, onMount } from 'svelte';
 	import { tweened, type Tweened } from 'svelte/motion';
-	import { linear, cubicOut } from 'svelte/easing';
-	import {
-		drawScale,
-		lineWidth,
-		Point,
-		rotationAboutPoint,
-		translateAndRotate,
-		getStrokeLightness
-	} from '$lib/game/store';
+	import { cubicOut } from 'svelte/easing';
+	import { drawScale, lineWidth, Point, getStrokeLightness, isSelectable } from '$lib/game/store';
 
 	// Export values of svelte componenet act as inputs
 	export let position: Point;
@@ -29,16 +22,24 @@
 	let positionOffset: Point;
 	// the rotation angle, clockwise in radians
 	let theta: number = 0; // degrees
-	const originalState: [position: Point, theta: number] = [position, theta];
+	let scaleHeight: number = 1; // unit length
+	// Save default position
+	const originalState: [position: Point, theta: number, scaleHeight: number] = [
+		position,
+		theta,
+		scaleHeight
+	];
 
-	let tweenedTheta: Tweened<number> = tweened(theta, { duration: 350, easing: linear });
+	let tweenedTheta: Tweened<number> = tweened(theta, { duration: 350, easing: cubicOut });
 	let tweenedPosition: Tweened<Point> = tweened(position, { duration: 1000, easing: cubicOut });
+	let tweenedScaleHeight: Tweened<number> = tweened(scaleHeight, {
+		duration: 350,
+		easing: cubicOut
+	});
 
 	const { register, unregister } = getContext('canvas');
 
 	onMount(() => {
-		updateCentrePosition();
-
 		register(draw, select, drag, drop, rotate, flip, reset);
 
 		return () => {
@@ -47,8 +48,51 @@
 	});
 
 	/**
-	 * Re-calculates the centre position and sets the centre variable
-	 * of the piece when called.
+	 * Returns a point rotated around a provided point at the specified angle.
+	 * @param position The cartesian point to be rotated
+	 * @param origin The point which to rotate around
+	 * @param theta The angle of rotation in degrees as per standard unit circle.
+	 * @returns
+	 */
+	export function rotationAboutPoint(position: Point, origin: Point, theta: number): Point {
+		// Convert from degrees to radians
+		theta = (Math.PI / 180) * theta;
+
+		// Translate so point of rotation is the origin
+		let xTranslated = position.getX() - origin.getX();
+		let yTranslated = position.getY() - origin.getY();
+
+		// Rotate
+		let xRotated = xTranslated * Math.cos(theta) - yTranslated * Math.sin(theta);
+		let yRotated = yTranslated * Math.cos(theta) + xTranslated * Math.sin(theta);
+
+		// Undo translation
+		let x = xRotated + origin.getX();
+		let y = yRotated + origin.getY();
+
+		return new Point(x, y);
+	}
+
+	/**
+	 * Rotates and translates the canvas by the angle specified
+	 * @param theta the rotation angle, clockwise in radians
+	 */
+	export function transformCanvas(
+		ctx: CanvasRenderingContext2D,
+		centre: Point,
+		theta: number,
+		scaleHeight: number
+	): void {
+		ctx.translate(centre.getX(), centre.getY());
+		ctx.rotate((Math.PI / 180) * theta);
+		ctx.scale(1, scaleHeight);
+		ctx.translate(-centre.getX(), -centre.getY());
+	}
+
+	/**
+	 * Calculates and sets a new centre position from the input reference position.
+	 * @param position Reference position to calculate centre position from.
+	 * Usually refers to the top left-hand corner of a shape.
 	 */
 	function updateCentrePosition(): void {
 		centre = new Point(
@@ -70,13 +114,25 @@
 	 */
 	function draw(ctx: CanvasRenderingContext2D) {
 		let theta: number = $tweenedTheta;
-		if (!isDragging) {
-			position = new Point($tweenedPosition.x, $tweenedPosition.y);
-		}
+		position = new Point((<any>$tweenedPosition).x, (<any>$tweenedPosition).y);
+		let scaleHeight: number = $tweenedScaleHeight;
 		updateCentrePosition();
-		translateAndRotate(ctx, centre, theta);
+
+		transformCanvas(ctx, centre, theta, scaleHeight);
 		drawPiece(ctx);
 		ctx.restore();
+	}
+
+	function drawCircles(ctx: CanvasRenderingContext2D): void {
+		ctx.beginPath();
+		ctx.fillStyle = 'red';
+		ctx.arc(position.getX(), position.getY(), 0.1 * $drawScale, 0, Math.PI * 2);
+		ctx.fill();
+
+		ctx.beginPath();
+		ctx.fillStyle = 'black';
+		ctx.arc(centre.getX(), centre.getY(), 0.1 * $drawScale, 0, Math.PI * 2);
+		ctx.fill();
 	}
 
 	/**
@@ -136,6 +192,8 @@
 			position.getX(),
 			centre.getY()
 		);
+
+		drawCircles(ctx);
 	}
 
 	/**
@@ -195,8 +253,9 @@
 		// Reset if click occurs on canvas
 		isSelected = false;
 
-		if (isCursorWithinPieceBoundary(cursorPosition, theta)) {
+		if (isCursorWithinPieceBoundary(cursorPosition, theta) && $isSelectable) {
 			isSelected = true;
+			isSelectable.set(false);
 			isDragging = true;
 			positionOffset = new Point(
 				position.getX() - cursorPosition.getX(),
@@ -217,7 +276,6 @@
 				cursorPosition.getX() + positionOffset.getX(),
 				cursorPosition.getY() + positionOffset.getY()
 			);
-			updateCentrePosition();
 			tweenedPosition.set(position, { duration: 0 });
 		}
 	}
@@ -229,6 +287,20 @@
 	 */
 	function drop(): void {
 		isDragging = false;
+
+		if (false) {
+			let transformedPosition = rotationAboutPoint(position, centre, theta);
+
+			let snapPosition = new Point(
+				Math.floor(transformedPosition.getX() / $drawScale) * $drawScale,
+				Math.floor(transformedPosition.getY() / $drawScale) * $drawScale
+			);
+			console.log('Normal');
+			console.log(position);
+			console.log('Transformed');
+			console.log(transformedPosition);
+			tweenedPosition.set(snapPosition, { duration: 250 });
+		}
 	}
 
 	/**
@@ -237,20 +309,26 @@
 	 */
 	function rotate(sign: number): void {
 		if (isSelected) {
-			theta = theta + 90 * sign;
+			theta += 90 * sign;
 			tweenedTheta.set(theta);
 		}
 	}
 
-	function flip(): void {}
+	function flip(): void {
+		if (isSelected) {
+			scaleHeight *= -1;
+			tweenedScaleHeight.set(scaleHeight);
+		}
+	}
 
 	/**
 	 * Resets the puzzle pieces to their original positions
 	 * around the board.
 	 */
 	function reset(): void {
-		[position, theta] = originalState;
-		tweenedTheta.set(theta);
+		[position, theta, scaleHeight] = originalState;
+		tweenedTheta.set(theta, { duration: 1000 });
 		tweenedPosition.set(position);
+		tweenedScaleHeight.set(scaleHeight);
 	}
 </script>
