@@ -1,5 +1,4 @@
 <script lang="ts">
-	// Controls 2x3 No Hole piece
 	import { getContext, onMount } from 'svelte';
 	import { tweened, type Tweened } from 'svelte/motion';
 	import { cubicOut } from 'svelte/easing';
@@ -12,26 +11,40 @@
 	export let svgPath: string;
 	export let hsl: [number, number, number];
 
+	// Styling variables
 	let fill: string = `hsl(${hsl[0]}, ${hsl[1]}%, ${hsl[2]}%)`;
 	let stroke: string = `hsl(${hsl[0]}, ${hsl[1]}%, ${getStrokeLightness(hsl[2])}%)`;
 
+	// Flags
 	let isSelected: boolean = false;
 	let isDragging: boolean = false;
 
+	// Position
 	let centre: Point;
+	let tweenedCentre: Point;
 	let positionOffset: Point;
+
+	// Transformation inputs
 	// the rotation angle, clockwise in radians
-	let theta: number = 0; // degrees
+	let thetaDeg: number = 0; // degrees
 	let scaleHeight: number = 1; // unit length
+
 	// Save default position
 	const originalState: [position: Point, theta: number, scaleHeight: number] = [
 		position,
-		theta,
+		thetaDeg,
 		scaleHeight
 	];
 
-	let tweenedTheta: Tweened<number> = tweened(theta, { duration: 350, easing: cubicOut });
-	let tweenedPosition: Tweened<Point> = tweened(position, { duration: 1000, easing: cubicOut });
+	// Set up tweened values
+	let tweenedTheta: Tweened<number> = tweened(thetaDeg, { duration: 350, easing: cubicOut });
+	let tweenedPosition: Tweened<Point> = tweened(position, {
+		duration: 1000,
+		easing: cubicOut,
+		interpolate: (a: Point, b: Point) => (t: number) => {
+			return new Point(a.getX() * (1 - t) + b.getX() * t, a.getY() * (1 - t) + b.getY() * t);
+		}
+	});
 	let tweenedScaleHeight: Tweened<number> = tweened(scaleHeight, {
 		duration: 350,
 		easing: cubicOut
@@ -50,31 +63,40 @@
 	/**
 	 * Returns a point rotated around a provided point at the specified angle.
 	 * @param position The cartesian point to be rotated
-	 * @param origin The point which to rotate around
+	 * @param centreOfRotation The point which to rotate around
 	 * @param theta The angle of rotation in degrees as per standard unit circle.
 	 * @returns
 	 */
-	export function rotationAboutPoint(position: Point, origin: Point, theta: number): Point {
+	export function getTransformedPosition(
+		position: Point,
+		centreOfRotation: Point,
+		thetaDeg: number,
+		scaleHeight: number
+	): Point {
 		// Convert from degrees to radians
-		theta = (Math.PI / 180) * theta;
+		let thetaRad = (Math.PI / 180) * thetaDeg;
 
 		// Translate so point of rotation is the origin
-		let xTranslated = position.getX() - origin.getX();
-		let yTranslated = position.getY() - origin.getY();
+		let xTranslated: number = position.getX() - centreOfRotation.getX();
+		let yTranslated: number = position.getY() - centreOfRotation.getY();
 
 		// Rotate
-		let xRotated = xTranslated * Math.cos(theta) - yTranslated * Math.sin(theta);
-		let yRotated = yTranslated * Math.cos(theta) + xTranslated * Math.sin(theta);
+		let yRotated: number = yTranslated * Math.cos(thetaRad) + xTranslated * Math.sin(thetaRad);
+		let xRotated: number = xTranslated * Math.cos(thetaRad) - yTranslated * Math.sin(thetaRad);
+
+		// Flip
+		yRotated *= scaleHeight;
 
 		// Undo translation
-		let x = xRotated + origin.getX();
-		let y = yRotated + origin.getY();
+		let x: number = xRotated + centreOfRotation.getX();
+		let y: number = yRotated + centreOfRotation.getY();
 
 		return new Point(x, y);
 	}
 
 	/**
-	 * Rotates and translates the canvas by the angle specified
+	 * Rotates and translates the canvas by the angle specified.
+	 * Tweened inputs requried
 	 * @param theta the rotation angle, clockwise in radians
 	 */
 	export function transformCanvas(
@@ -99,31 +121,37 @@
 			position.getX() + (width * $drawScale) / 2,
 			position.getY() + (height * $drawScale) / 2
 		);
+
+		console.log($tweenedPosition);
+
+		tweenedCentre = new Point(
+			$tweenedPosition.getX() + (width * $drawScale) / 2,
+			$tweenedPosition.getY() + (height * $drawScale) / 2
+		);
 	}
 
 	/**
-	 * Returns the SVG moveto command to be prepended to the svgPath
+	 * Returns the SVG moveto command to be prepended to the svgPath.
+	 * Tweened inputs required.
 	 */
-	function getMoveTo(): string {
+	function getMoveTo(position: Point): string {
 		return 'M' + position.getX() + ',' + position.getY();
 	}
 
 	/**
-	 * Draws the puzzle piece and applys the required transformations to the canvas to do so
+	 * Draws the puzzle piece and applys the required transformations to the canvas to do so.
+	 * Tweened inputs required.
 	 * @param ctx the canvas context which to draw the path on
 	 */
 	function draw(ctx: CanvasRenderingContext2D) {
-		let theta: number = $tweenedTheta;
-		position = new Point((<any>$tweenedPosition).x, (<any>$tweenedPosition).y);
-		let scaleHeight: number = $tweenedScaleHeight;
 		updateCentrePosition();
-
-		transformCanvas(ctx, centre, theta, scaleHeight);
-		drawPiece(ctx);
+		transformCanvas(ctx, tweenedCentre, $tweenedTheta, $tweenedScaleHeight);
+		drawPiece(ctx, $tweenedPosition, tweenedCentre);
 		ctx.restore();
 	}
 
-	function drawCircles(ctx: CanvasRenderingContext2D): void {
+	// TODO - Can be removed when no longer needed. Tweened inputs required.
+	function drawCircles(ctx: CanvasRenderingContext2D, position: Point, centre: Point): void {
 		ctx.beginPath();
 		ctx.fillStyle = 'red';
 		ctx.arc(position.getX(), position.getY(), 0.1 * $drawScale, 0, Math.PI * 2);
@@ -136,11 +164,13 @@
 	}
 
 	/**
-	 * Creates the path of the puzzle piece to be drawn
+	 * Creates the path of the puzzle piece to be drawn.
+	 * Tweened inputs required. Centre argument can be removed in future
 	 * @param ctx the canvas context which to draw the path on
 	 */
-	function drawPiece(ctx: CanvasRenderingContext2D): void {
-		let ctxPath: Path2D = new Path2D(getMoveTo() + svgPath);
+	// TODO - remove centre argument in future
+	function drawPiece(ctx: CanvasRenderingContext2D, position: Point, centre: Point): void {
+		let ctxPath: Path2D = new Path2D(getMoveTo(position) + svgPath);
 
 		// Draw the puzzle piece shape
 		ctx.beginPath();
@@ -193,20 +223,21 @@
 			centre.getY()
 		);
 
-		drawCircles(ctx);
+		drawCircles(ctx, position, centre);
 	}
 
 	/**
 	 * Checks if the current cursor position is on the shape
+	 * Do not use tweened values.
 	 * @param cursorPosition a Point representing the current position of the cursor on the canvas
-	 * @param theta the rotation angle, clockwise in radians
 	 */
-	function isCursorWithinPieceBoundary(cursorPosition: Point, theta: number): boolean {
-		let point1 = rotationAboutPoint(position, centre, theta);
-		let point2 = rotationAboutPoint(
+	function isCursorWithinPieceBoundary(cursorPosition: Point): boolean {
+		let point1 = getTransformedPosition(position, centre, thetaDeg, scaleHeight);
+		let point2 = getTransformedPosition(
 			new Point(position.getX() + width * $drawScale, position.getY() + height * $drawScale),
 			centre,
-			theta
+			thetaDeg,
+			scaleHeight
 		);
 
 		let xMin: number;
@@ -245,7 +276,7 @@
 
 	/**
 	 * Determines if the mousedown event occured while the mouse was
-	 * on the puzzle piece.
+	 * on the puzzle piece. Do not use tweened inputs.
 	 * @param cursorPosition A Point which contains the relative canvas coordinates of
 	 * the cursor position.
 	 */
@@ -253,10 +284,11 @@
 		// Reset if click occurs on canvas
 		isSelected = false;
 
-		if (isCursorWithinPieceBoundary(cursorPosition, theta) && $isSelectable) {
+		if (isCursorWithinPieceBoundary(cursorPosition) && $isSelectable) {
 			isSelected = true;
 			isSelectable.set(false);
 			isDragging = true;
+
 			positionOffset = new Point(
 				position.getX() - cursorPosition.getX(),
 				position.getY() - cursorPosition.getY()
@@ -284,23 +316,20 @@
 	 * If is partly on a board position, will cause puzzle piece
 	 * to snap to it. Otherwise will stay where the user released
 	 * the mouse.
+	 * Do not use tweened values.
 	 */
 	function drop(): void {
 		isDragging = false;
 
-		if (false) {
-			let transformedPosition = rotationAboutPoint(position, centre, theta);
+		let truePosition: Point = getTransformedPosition(position, centre, thetaDeg, scaleHeight);
 
-			let snapPosition = new Point(
-				Math.floor(transformedPosition.getX() / $drawScale) * $drawScale,
-				Math.floor(transformedPosition.getY() / $drawScale) * $drawScale
-			);
-			console.log('Normal');
-			console.log(position);
-			console.log('Transformed');
-			console.log(transformedPosition);
-			tweenedPosition.set(snapPosition, { duration: 250 });
-		}
+		let snapPosition = new Point(
+			Math.floor(truePosition.getX() / $drawScale) * $drawScale,
+			Math.floor(truePosition.getY() / $drawScale) * $drawScale
+		);
+
+		position = getTransformedPosition(snapPosition, centre, -thetaDeg, scaleHeight);
+		tweenedPosition.set(position, { duration: 250 });
 	}
 
 	/**
@@ -309,8 +338,8 @@
 	 */
 	function rotate(sign: number): void {
 		if (isSelected) {
-			theta += 90 * sign;
-			tweenedTheta.set(theta);
+			thetaDeg += 90 * sign;
+			tweenedTheta.set(thetaDeg);
 		}
 	}
 
@@ -326,9 +355,10 @@
 	 * around the board.
 	 */
 	function reset(): void {
-		[position, theta, scaleHeight] = originalState;
-		tweenedTheta.set(theta, { duration: 1000 });
-		tweenedPosition.set(position);
+		[position, thetaDeg, scaleHeight] = originalState;
+
+		tweenedTheta.set(thetaDeg, { duration: 1000 });
+		tweenedPosition.set(position, {});
 		tweenedScaleHeight.set(scaleHeight);
 	}
 </script>
