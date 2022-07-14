@@ -2,7 +2,16 @@
 	import { getContext, onMount } from 'svelte';
 	import { tweened, type Tweened } from 'svelte/motion';
 	import { cubicOut } from 'svelte/easing';
-	import { drawScale, lineWidth, Point, getStrokeLightness, isSelectable } from '$lib/game/store';
+	import {
+		drawScale,
+		lineWidth,
+		Point,
+		getStrokeLightness,
+		isSelectable,
+		slope,
+		intercept,
+		isVerticalOrHorizontalSlope
+	} from '$lib/game/store';
 
 	// Export values of svelte componenet act as inputs
 	export let position: Point;
@@ -80,12 +89,12 @@
 		let xTranslated: number = position.getX() - centreOfRotation.getX();
 		let yTranslated: number = position.getY() - centreOfRotation.getY();
 
+		// Flip
+		yTranslated *= scaleHeight;
+
 		// Rotate
 		let yRotated: number = yTranslated * Math.cos(thetaRad) + xTranslated * Math.sin(thetaRad);
 		let xRotated: number = xTranslated * Math.cos(thetaRad) - yTranslated * Math.sin(thetaRad);
-
-		// Flip
-		yRotated *= scaleHeight;
 
 		// Undo translation
 		let x: number = xRotated + centreOfRotation.getX();
@@ -122,11 +131,30 @@
 			position.getY() + (height * $drawScale) / 2
 		);
 
-		console.log($tweenedPosition);
-
 		tweenedCentre = new Point(
 			$tweenedPosition.getX() + (width * $drawScale) / 2,
 			$tweenedPosition.getY() + (height * $drawScale) / 2
+		);
+	}
+
+	function calculateSnappedPosition(position: Point, theta: number): Point {
+		// Convert to radians
+		theta = (Math.PI / 180) * theta;
+
+		return new Point(0, 0);
+	}
+
+	function calculateSnappedCentre(newPosition: Point, theta: number): Point {
+		// Convert to radians
+		theta = (Math.PI / 180) * theta;
+
+		let transformedHeight: number = height * scaleHeight;
+
+		return new Point(
+			newPosition.getX() +
+				((width * Math.cos(theta) - transformedHeight * Math.sin(theta)) * $drawScale) / 2,
+			newPosition.getY() +
+				((transformedHeight * Math.cos(theta) + width * Math.sin(theta)) * $drawScale) / 2
 		);
 	}
 
@@ -148,6 +176,7 @@
 		transformCanvas(ctx, tweenedCentre, $tweenedTheta, $tweenedScaleHeight);
 		drawPiece(ctx, $tweenedPosition, tweenedCentre);
 		ctx.restore();
+		ctx.save();
 	}
 
 	// TODO - Can be removed when no longer needed. Tweened inputs required.
@@ -232,45 +261,72 @@
 	 * @param cursorPosition a Point representing the current position of the cursor on the canvas
 	 */
 	function isCursorWithinPieceBoundary(cursorPosition: Point): boolean {
-		let point1 = getTransformedPosition(position, centre, thetaDeg, scaleHeight);
-		let point2 = getTransformedPosition(
-			new Point(position.getX() + width * $drawScale, position.getY() + height * $drawScale),
+		// Canvas positions (the canvas which the shape is drawn on)
+		// P1 - - - - - P3
+		// |             |
+		// |             |
+		// P2 - - - - - P4
+		// point1 = $tweenedPosition
+		let point2: Point = new Point(
+			$tweenedPosition.getX(),
+			$tweenedPosition.getY() + height * $drawScale
+		);
+		let point3: Point = new Point(
+			$tweenedPosition.getX() + width * $drawScale,
+			$tweenedPosition.getY()
+		);
+		let point4: Point = new Point(
+			$tweenedPosition.getX() + width * $drawScale,
+			$tweenedPosition.getY() + height * $drawScale
+		);
+
+		// Screen positions (how the shapes are transformed to user)
+		let transformedPoint1: Point = getTransformedPosition(
+			$tweenedPosition,
 			centre,
 			thetaDeg,
 			scaleHeight
 		);
+		let transformedPoint2: Point = getTransformedPosition(point2, centre, thetaDeg, scaleHeight);
+		let transformedPoint3: Point = getTransformedPosition(point3, centre, thetaDeg, scaleHeight);
+		let transformedPoint4: Point = getTransformedPosition(point4, centre, thetaDeg, scaleHeight);
 
-		let xMin: number;
-		let xMax: number;
-
-		if (point1.getX() > point2.getX()) {
-			xMax = point1.getX();
-			xMin = point2.getX();
+		if (isVerticalOrHorizontalSlope(transformedPoint1, transformedPoint2)) {
+			if (
+				Math.min(transformedPoint1.getX(), transformedPoint4.getX()) <= cursorPosition.getX() &&
+				cursorPosition.getX() <= Math.max(transformedPoint1.getX(), transformedPoint4.getX()) &&
+				Math.min(transformedPoint1.getY(), transformedPoint4.getY()) <= cursorPosition.getY() &&
+				cursorPosition.getY() <= Math.max(transformedPoint1.getY(), transformedPoint4.getY())
+			) {
+				return true;
+			} else {
+				return false;
+			}
 		} else {
-			xMin = point1.getX();
-			xMax = point2.getX();
-		}
+			// slope for point1 to point3 and point 2 to point 4
+			let widthSlope = slope(transformedPoint1, transformedPoint3);
+			// slope for point1 to point2 and point3 to point4
+			let heightSlope = slope(transformedPoint1, transformedPoint2);
 
-		let yMin: number;
-		let yMax: number;
+			let heightIntercept1: number = intercept(transformedPoint1, heightSlope);
+			let heightIntercept2: number = intercept(transformedPoint3, heightSlope);
+			let widthIntercept1: number = intercept(transformedPoint1, widthSlope);
+			let widthIntercept2: number = intercept(transformedPoint2, widthSlope);
 
-		if (point1.getY() > point2.getY()) {
-			yMax = point1.getY();
-			yMin = point2.getY();
-		} else {
-			yMin = point1.getY();
-			yMax = point2.getY();
-		}
-
-		if (
-			xMin <= cursorPosition.getX() &&
-			cursorPosition.getX() <= xMax &&
-			yMin <= cursorPosition.getY() &&
-			cursorPosition.getY() <= yMax
-		) {
-			return true;
-		} else {
-			return false;
+			if (
+				heightSlope * cursorPosition.getX() + Math.min(heightIntercept1, heightIntercept2) <=
+					cursorPosition.getY() &&
+				cursorPosition.getY() <=
+					heightSlope * cursorPosition.getX() + Math.max(heightIntercept1, heightIntercept2) &&
+				widthSlope * cursorPosition.getX() + Math.min(widthIntercept1, widthIntercept2) <=
+					cursorPosition.getY() &&
+				cursorPosition.getY() <=
+					widthSlope * cursorPosition.getX() + Math.max(widthIntercept1, widthIntercept2)
+			) {
+				return true;
+			} else {
+				return false;
+			}
 		}
 	}
 
@@ -309,7 +365,84 @@
 				cursorPosition.getY() + positionOffset.getY()
 			);
 			tweenedPosition.set(position, { duration: 0 });
+			updateCentrePosition();
 		}
+	}
+
+	/**
+	 * Will snap the puzzle piece into the place it is within.
+	 */
+	function snap(): void {
+		let transformedPosition: Point = getTransformedPosition(
+			position,
+			centre,
+			thetaDeg,
+			scaleHeight
+		);
+
+		let snapPosition: Point = new Point(0, 0);
+
+		// snapPosition = new Point(
+		// 	Math.floor(transformedPosition.getX() / $drawScale) * $drawScale,
+		// 	Math.floor(transformedPosition.getY() / $drawScale) * $drawScale
+		// );
+		if (scaleHeight === 1) {
+			if (thetaDeg % 360 === 0) {
+				snapPosition = new Point(
+					Math.floor(transformedPosition.getX() / $drawScale) * $drawScale,
+					Math.floor(transformedPosition.getY() / $drawScale) * $drawScale
+				);
+			} else if (thetaDeg % 360 === 90 || thetaDeg % 360 === -270) {
+				snapPosition = new Point(
+					Math.ceil(transformedPosition.getX() / $drawScale) * $drawScale,
+					Math.floor(transformedPosition.getY() / $drawScale) * $drawScale
+				);
+			} else if (thetaDeg % 360 === 180 || thetaDeg % 360 === -180) {
+				snapPosition = new Point(
+					Math.ceil(transformedPosition.getX() / $drawScale) * $drawScale,
+					Math.ceil(transformedPosition.getY() / $drawScale) * $drawScale
+				);
+			} else {
+				// thetaDeg % 360 === 270 || thetaDeg % 360 === -90
+				snapPosition = new Point(
+					Math.floor(transformedPosition.getX() / $drawScale) * $drawScale,
+					Math.ceil(transformedPosition.getY() / $drawScale) * $drawScale
+				);
+			}
+		} else {
+			// scaleHeight === -1
+			if (thetaDeg % 360 === 0) {
+				snapPosition = new Point(
+					Math.floor(transformedPosition.getX() / $drawScale) * $drawScale,
+					Math.ceil(transformedPosition.getY() / $drawScale) * $drawScale
+				);
+			} else if (thetaDeg % 360 === 90 || thetaDeg % 360 === -270) {
+				snapPosition = new Point(
+					Math.floor(transformedPosition.getX() / $drawScale) * $drawScale,
+					Math.floor(transformedPosition.getY() / $drawScale) * $drawScale
+				);
+			} else if (thetaDeg % 360 === 180 || thetaDeg % 360 === -180) {
+				snapPosition = new Point(
+					Math.ceil(transformedPosition.getX() / $drawScale) * $drawScale,
+					Math.floor(transformedPosition.getY() / $drawScale) * $drawScale
+				);
+			} else {
+				// thetaDeg % 360 === 270 || thetaDeg % 360 === -90
+				snapPosition = new Point(
+					Math.ceil(transformedPosition.getX() / $drawScale) * $drawScale,
+					Math.ceil(transformedPosition.getY() / $drawScale) * $drawScale
+				);
+			}
+		}
+
+		let newCentre: Point = calculateSnappedCentre(snapPosition, thetaDeg);
+		position = getTransformedPosition(
+			snapPosition,
+			newCentre,
+			-thetaDeg * scaleHeight,
+			scaleHeight
+		);
+		tweenedPosition.set(position, { duration: 250 });
 	}
 
 	/**
@@ -321,15 +454,12 @@
 	function drop(): void {
 		isDragging = false;
 
-		let truePosition: Point = getTransformedPosition(position, centre, thetaDeg, scaleHeight);
-
-		let snapPosition = new Point(
-			Math.floor(truePosition.getX() / $drawScale) * $drawScale,
-			Math.floor(truePosition.getY() / $drawScale) * $drawScale
-		);
-
-		position = getTransformedPosition(snapPosition, centre, -thetaDeg, scaleHeight);
-		tweenedPosition.set(position, { duration: 250 });
+		// Only snap if position doesn't align with grid
+		if (isSelected) {
+			if ($tweenedPosition.getX() % $drawScale != 0 || $tweenedPosition.getY() % $drawScale != 0) {
+				snap();
+			}
+		}
 	}
 
 	/**
