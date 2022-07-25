@@ -1,3 +1,7 @@
+<script context="module" lang="ts">
+	export const prerender = true;
+</script>
+
 <script lang="ts">
 	import {
 		colour_classes,
@@ -8,7 +12,8 @@
 		number_of_hints,
 		day_solved_for,
 		month_solved_for,
-		hide_text
+		hide_text,
+		is_valid_solution
 	} from '$lib/solver/store';
 	import {} from '$lib/solver/store';
 	import { get_board_index } from '$lib/solver/utils';
@@ -34,7 +39,6 @@
 	// to the button to change its background colour
 	let button_colour_groups: number[][] = [[], [], [], [], [], [], [], []];
 	let covered_buttons: number[] = [];
-
 	let website_colors: String[] = ['#19232D', '#EDD3C4', '#C8ADC0', '#748067', '#3E7CB1'];
 
 	function select_month(event: MouseEvent): void {
@@ -67,10 +71,12 @@
 	// Will clear board if day and month selected is not what the current solution is for
 	function update_board(): void {
 		if ($month_solved_for != $selected_month || $day_solved_for != $selected_day) {
-			clear_peices();
+			is_valid_solution.set(false);
 		} else {
-			show_pieces();
+			is_valid_solution.set(true);
 		}
+
+		show_pieces();
 	}
 
 	// Clears the board
@@ -89,12 +95,17 @@
 
 	// Adds pieces to the board (selected randomly), based on number of hints the user wants displayed.
 	function show_pieces(): void {
+		// Remove current assigned colours (i.e. remove pieces)
+		clear_peices();
+
+		// Guard checks
 		if ($solution_set.length == 0) {
 			return;
 		}
 
-		// Remove current assigned colours
-		clear_peices();
+		if (!$is_valid_solution) {
+			return;
+		}
 
 		// Loop through number of hints and assign to a colour group
 		for (let hint = 0; hint < $number_of_hints; hint++) {
@@ -204,9 +215,6 @@
 </div>
 
 <style>
-	p {
-		font-size: 1.5rem;
-	}
 	.calendar {
 		padding-top: 5rem;
 	}
