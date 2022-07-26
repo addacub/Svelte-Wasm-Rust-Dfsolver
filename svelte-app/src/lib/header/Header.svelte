@@ -40,7 +40,7 @@
 	}
 
 	.corner {
-		width: 3em;
+		width: 5em;
 		height: 3em;
 	}
 
@@ -120,5 +120,29 @@
 
 	a:hover {
 		color: var(--accent-color);
+	}
+
+	@media screen and (max-height: 760px) and (orientation: landscape) {
+		svg {
+			width: 1em;
+			height: 1.5em;
+			display: block;
+		}
+
+		ul {
+			height: 1.5em;
+		}
+	}
+
+	@media screen and (max-width: 620px) and (orientation: portrait) {
+		svg {
+			width: 1.33em;
+			height: 2em;
+			display: block;
+		}
+
+		ul {
+			height: 2em;
+		}
 	}
 </style>

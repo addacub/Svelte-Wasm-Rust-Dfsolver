@@ -215,28 +215,24 @@
 </div>
 
 <style>
-	.calendar {
-		padding-top: 5rem;
-	}
-
 	.month-container {
 		display: inline-grid;
 		grid-template-columns: auto auto auto auto auto auto;
 	}
 
 	.day-container {
-		display: grid;
+		display: inline-grid;
 		grid-template-columns: auto auto auto auto auto auto auto;
 	}
 
 	.calendar button {
-		width: 7rem;
-		height: 7rem;
-		font-size: 2rem;
 		font-family: Arial, Helvetica, sans-serif;
 		border-style: solid;
 		border-width: 0.2rem;
 		border-radius: 5%;
+		width: 7rem;
+		height: 7rem;
+		font-size: 2rem;
 	}
 
 	.calendar button:hover {
@@ -284,5 +280,37 @@
 	.pressed {
 		background-color: rgb(255, 246, 195);
 		border-color: rgb(110, 110, 110) white white rgb(110, 110, 110);
+	}
+
+	@media screen and (max-height: 1000px) and (orientation: landscape) {
+		.calendar button {
+			width: 5rem;
+			height: 5rem;
+			font-size: 1.5rem;
+		}
+	}
+
+	@media screen and (max-height: 760px) and (orientation: landscape) {
+		.calendar button {
+			width: 2.5rem;
+			height: 2.5rem;
+			font-size: 0.8rem;
+		}
+	}
+
+	@media screen and (max-width: 1200px) and (orientation: portrait) {
+		.calendar button {
+			width: 5rem;
+			height: 5rem;
+			font-size: 1.5rem;
+		}
+	}
+
+	@media screen and (max-width: 620px) and (orientation: portrait) {
+		.calendar button {
+			width: 2.5rem;
+			height: 2.5rem;
+			font-size: 0.8rem;
+		}
 	}
 </style>

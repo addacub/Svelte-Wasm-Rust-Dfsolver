@@ -57,63 +57,64 @@
 	}
 </script>
 
-<section class="row">
-	<div class="column left">
-		<div class="slide-container padded">
-			<p>Select how many pieces to show:</p>
-			<input bind:value={$number_of_hints} type="range" min="0" max="8" step="1" />
-			<output><b>{$number_of_hints}</b></output>
+<div class="content">
+	<section class="row">
+		<div class="column left">
+			<div class="slide-container">
+				<p>Select how many pieces to show:</p>
+				<input bind:value={$number_of_hints} type="range" min="0" max="8" step="1" />
+				<output><b>{$number_of_hints}</b></output>
+			</div>
 		</div>
-	</div>
-</section>
-<section class="row">
-	<div class="column left">
-		<div class="spinner-container padded">
-			<p>Select solution to show:</p>
-			<input
-				type="number"
-				bind:value={$solution_number}
-				min="1"
-				max={$solution_set != undefined ? $solution_set.length : 0}
-				disabled={$solution_set == undefined}
-				on:change={set_selected_solution}
-			/>
-			{#if $solution_set != undefined}
-				<p>{$solution_set.length} solutions were found.</p>
-			{:else}
-				<p>No solutions to select from.</p>
+	</section>
+	<section class="row">
+		<div class="column left">
+			<div class="spinner-container ">
+				<p>Select solution to show:</p>
+				<input
+					type="number"
+					bind:value={$solution_number}
+					min="1"
+					max={$solution_set != undefined ? $solution_set.length : 0}
+					disabled={$solution_set == undefined}
+					on:change={set_selected_solution}
+				/>
+				{#if $solution_set != undefined}
+					<p>{$solution_set.length} solutions were found.</p>
+				{:else}
+					<p>No solutions to select from.</p>
+				{/if}
+			</div>
+		</div>
+	</section>
+	<section class="row">
+		<div class="column left ">
+			<label for="checkbox_1">Cover dates when piece is revealed?</label>
+		</div>
+		<div class="column right ">
+			<input type="checkbox" id="checkbox_1" bind:checked={$hide_text} />
+		</div>
+	</section>
+	<section class="row">
+		<div class="column left ">
+			<button
+				type="button"
+				disabled={$selected_day == undefined || $selected_month == undefined || processing}
+				on:click={solve_click}
+			>
+				Solve!
+			</button>
+			{#if $selected_day == undefined || !selected_month == undefined}
+				<p>Select a day and month to solve for.</p>
 			{/if}
 		</div>
-	</div>
-</section>
-<section class="row">
-	<div class="column left padded">
-		<p>Cover dates when piece is revealed?</p>
-	</div>
-	<div class="column right padded">
-		<input type="checkbox" bind:checked={$hide_text} style="top: 50%; position:relative" />
-	</div>
-</section>
-<section class="row">
-	<div class="column left padded">
-		<button
-			type="button"
-			disabled={$selected_day == undefined || $selected_month == undefined || processing}
-			on:click={solve_click}
-			style="display: inline; margin-right: 1rem"
-		>
-			Solve!
-		</button>
-		{#if $selected_day == undefined || !selected_month == undefined}
-			<p>Select a day and month to solve for.</p>
-		{/if}
-	</div>
-	<div class="column right padded" style="display:block">
-		{#if processing}
-			<Circle2 size="60" unit="px" />
-		{/if}
-	</div>
-</section>
+		<div class="column right " style="display:block">
+			{#if processing}
+				<Circle2 size="60" unit="px" />
+			{/if}
+		</div>
+	</section>
+</div>
 
 <style>
 	div {
@@ -125,6 +126,13 @@
 		margin: auto;
 	}
 
+	input[type='checkbox'] {
+		position: relative;
+		top: 50%;
+		width: 20px;
+		height: 20px;
+	}
+
 	output {
 		text-align: center;
 		color: white;
@@ -133,9 +141,10 @@
 	}
 
 	button {
+		display: inline;
+		margin-right: 1rem;
 		background-color: #c8adc0;
 		width: 6em;
-		height: 2em;
 		font-size: xx-large;
 		border-width: 5px;
 		border-color: white rgb(110, 110, 110) rgb(110, 110, 110) white;
@@ -149,12 +158,9 @@
 		background-color: hsl(318, 20%, 50%);
 	}
 
-	.padded {
-		padding-top: 5rem;
-	}
-
 	.row {
 		display: flex;
+		padding-bottom: 25%;
 	}
 
 	.column {
@@ -167,6 +173,58 @@
 
 	.right {
 		width: 30%;
-		margin-right: 6rem;
+	}
+
+	.content {
+		height: fit-content;
+	}
+
+	@media screen and (max-height: 760px) and (orientation: landscape) {
+		.row {
+			padding-bottom: 10%;
+		}
+
+		.content {
+			height: 400px;
+		}
+
+		button {
+			font-size: large;
+		}
+
+		input[type='range'] {
+			width: fit-content;
+			height: fit-content;
+			font-size: x-small;
+		}
+
+		input[type='number'] {
+			width: fit-content;
+			height: fit-content;
+			font-size: x-small;
+		}
+
+		input[type='checkbox'] {
+			width: 15px;
+			height: 15px;
+		}
+
+		p {
+			font-size: small;
+		}
+
+		label {
+			font-size: small;
+		}
+
+		output {
+			font-size: small;
+		}
+	}
+
+	@media screen and (max-width: 1200px) and (orientation: portrait) {
+		.content {
+			padding-top: 2rem;
+		}
 	}
 </style>

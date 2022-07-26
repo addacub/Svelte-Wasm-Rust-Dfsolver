@@ -61,6 +61,12 @@ p {
 	line-height: 1.5;
 }
 
+label {
+	font-weight: 400;
+	color: var(--heading-color);
+	line-height: 1.5;
+}
+
 a {
 	color: var(--accent-color);
 	text-decoration: none;
