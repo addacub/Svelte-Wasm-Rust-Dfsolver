@@ -36,7 +36,8 @@
     "typescript": "~4.6.2",
     "vite": "^2.7.13",
     "vite-plugin-rsw": "^1.10.2",
-    "vite-plugin-wasm-pack": "^0.1.12"
+    "vite-plugin-wasm-pack": "^0.1.12",
+    "katex": "latest"
   },
   "type": "module",
   "dependencies": {

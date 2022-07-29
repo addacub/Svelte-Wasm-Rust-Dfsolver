@@ -78,7 +78,6 @@
 	.centred {
 		/* Center vertically and horizontally */
 		display: flex;
-		justify-content: center;
 		align-items: center;
 	}
 
@@ -110,7 +109,6 @@
 		.column {
 			/* Center vertically and horizontally */
 			display: flex;
-			justify-content: center;
 			align-items: center;
 		}
 	}
