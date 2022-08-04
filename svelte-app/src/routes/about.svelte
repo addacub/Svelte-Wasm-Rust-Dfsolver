@@ -16,9 +16,14 @@
 
 <script lang="ts">
 	import Katex from '$lib/about/Katex.svelte';
-	import Piece from '$lib/about/TablePiece.svelte';
-	import { pieces } from '$lib/about/piece';
-	import AnimatedPiece from '$lib/about/AnimatedPiece.svelte';
+	import Piece from '$lib/about/Piece.svelte';
+	import { table_pieces } from '$lib/about/piece';
+	import RepresentingProblem from '$lib/about/animations/RepresentingProblem.svelte';
+	import BoardPosition from '$lib/about/animations/BoardPosition.svelte';
+	import PlacePiece from '$lib/about/animations/PlacePiece.svelte';
+	import ValidMove from '$lib/about/animations/ValidMove.svelte';
+	import TranslatePiece from '$lib/about/animations/TranslatePiece.svelte';
+	import PieceOrientations from '$lib/about/animations/PieceOrientations.svelte';
 </script>
 
 <svelte:head>
@@ -56,7 +61,7 @@
 	</p>
 
 	<div class="highlight_container">
-		<AnimatedPiece />
+		<RepresentingProblem />
 	</div>
 
 	<h2>The Solution Space</h2>
@@ -82,15 +87,15 @@
 			</colgroup>
 			<tr>
 				<th>Pieces</th>
-				{#each pieces as piece}
-					<td
-						><Piece
-							width={piece.get_width()}
-							height={piece.get_height()}
-							svg_path={piece.get_path()}
-							hsl={piece.get_fill()}
-						/></td
-					>
+				{#each table_pieces as piece}
+					<td>
+						<svg
+							width={(piece.width + piece.padding) * piece.draw_scale}
+							height={(piece.height + piece.padding) * piece.draw_scale}
+						>
+							<Piece {piece} />
+						</svg>
+					</td>
 				{/each}
 			</tr>
 		</table>
@@ -137,7 +142,7 @@
 	</p>
 	<ul>
 		<li><i>L</i>: is the total number of levels (i.e. how many pieces need to be placed).</li>
-		<li><b>d</b>: is an array of the degrees of each node at level <i>i</i>.</li>
+		<li><b>d</b>: is an array of the degrees of the nodes at level <i>i</i>.</li>
 	</ul>
 
 	<p>The table below summaries the number of rotations and flips for each piece.</p>
@@ -149,31 +154,31 @@
 			</colgroup>
 			<tr>
 				<th>Pieces</th>
-				{#each pieces as piece}
-					<td
-						><Piece
-							width={piece.get_width()}
-							height={piece.get_height()}
-							svg_path={piece.get_path()}
-							hsl={piece.get_fill()}
-						/></td
-					>
+				{#each table_pieces as piece}
+					<td>
+						<svg
+							width={(piece.width + piece.padding) * piece.draw_scale}
+							height={(piece.height + piece.padding) * piece.draw_scale}
+						>
+							<Piece {piece} />
+						</svg>
+					</td>
 				{/each}
 			</tr>
 			<tr>
-				<th>Rotations</th>
+				<th>Rotations (R)</th>
 				{#each new Array(8) as i}
 					<td>4</td>
 				{/each}
 			</tr>
 			<tr>
-				<th>Flips</th>
+				<th>Flips (F)</th>
 				{#each new Array(8) as i}
 					<td>2</td>
 				{/each}
 			</tr>
 			<tr>
-				<th>Total Unique Pieces</th>
+				<th>Total Unique Pieces (=R&#215;F)</th>
 				{#each new Array(8) as i}
 					<td>8</td>
 				{/each}
@@ -210,19 +215,19 @@
 			</colgroup>
 			<tr>
 				<th>Pieces</th>
-				{#each pieces as piece}
-					<td
-						><Piece
-							width={piece.get_width()}
-							height={piece.get_height()}
-							svg_path={piece.get_path()}
-							hsl={piece.get_fill()}
-						/></td
-					>
+				{#each table_pieces as piece}
+					<td>
+						<svg
+							width={(piece.width + piece.padding) * piece.draw_scale}
+							height={(piece.height + piece.padding) * piece.draw_scale}
+						>
+							<Piece {piece} />
+						</svg>
+					</td>
 				{/each}
 			</tr>
 			<tr>
-				<th>Rotations</th>
+				<th>Rotations (R)</th>
 				<td>2</td>
 				{#each new Array(5) as i}
 					<td>4</td>
@@ -231,7 +236,7 @@
 				<td>4</td>
 			</tr>
 			<tr>
-				<th>Flips</th>
+				<th>Flips (F)</th>
 				<td>1</td>
 				<td>1</td>
 				{#each new Array(5) as i}
@@ -240,7 +245,7 @@
 				<td>1</td>
 			</tr>
 			<tr>
-				<th>Total Unique Pieces</th>
+				<th>Total Unique Pieces (=R&#215;F)</th>
 				<td>2</td>
 				<td>4</td>
 				{#each new Array(4) as i}
@@ -264,14 +269,203 @@
 	<h2>Where a Piece is Placed</h2>
 
 	<p>
-		A puzzle piece is placed on the board at the first available space. The next available space
-		(board position) is found by scanning across the board left to right and top to bottom, like
-		reading a sentence. The puzzle piece is only placed if it is a valid position.
+		The first available space (board position) is found by scanning across the board left to right
+		and top to bottom, like reading a sentence:
 	</p>
+
+	<div class="highlight_container">
+		<BoardPosition />
+	</div>
+
+	<p>
+		A puzzle piece is placed on the first available square on the board. When placing a piece, the
+		first "square" of the piece is placed ontop of the first available sqaure on the board:
+	</p>
+
+	<div class="highlight_container">
+		<PlacePiece />
+	</div>
+
+	<p>Note, a puzzle piece is only placed if it is a valid position.</p>
 
 	<h2>Definition of Valid</h2>
 
+	<p>
+		Before placing a piece, the following questions are asked to determine if a piece will be placed
+		in a valid position:
+	</p>
+	<ul>
+		<li>Will the puzzle piece go outside the bounds of the puzzle board?</li>
+		<li>Will the piece overlap with any pieces that have been placed?</li>
+		<li>Will placing the piece leave any unreachable holes?</li>
+	</ul>
+	<p>
+		A hole is any board position which hasn't been covered with a piece. If a hole is too small, no
+		piece can be placed there without overlapping with other pieces that have been placed. I.e it is
+		unreachable.
+	</p>
+
+	<p>
+		<b>
+			If the answer to any of the above questions is yes, the position is not valid and the piece
+			cannot be placed.
+		</b>
+	</p>
+
+	<p>
+		For example, assuming today's date is the 1st of September, if the purple piece is to be placed
+		onto the next available board position, the May square becomes the next available board
+		position. However, no piece can be placed on the May square without overlapping with the already
+		existing piece. It is <b>unreachable</b>. Hence, this is not a valid position.
+	</p>
+
+	<div class="highlight_container">
+		<ValidMove />
+	</div>
+
 	<h2>How a Piece is Placed</h2>
+
+	<p>
+		If the piece cannot be placed at the current available board position, the piece's orientation
+		is changed or a new piece may be attempted to be placed instead. The rules for exhausting all of
+		a piece's orientations are as follows:
+	</p>
+	<ul>
+		<li>If the piece has not exhausted its rotations, rotate the piece by 90&#176.</li>
+		<li>
+			Else if the piece has exhausted its rotations, flip the piece if it can be flipped and has not
+			already been flipped.
+		</li>
+		<li>Else move on to next available puzzle piece.</li>
+	</ul>
+
+	<p>
+		Note, if a piece is flipped, the number of rotations it undergo is reset. Refer to the tables
+		for how many rotations and flips each piece can undergo. The below animation shows how a piece's
+		orientation is exhausted. The steps consist of:
+	</p>
+
+	<ul>
+		<li>Rotating the piece 3 times to obtain four unique rotational orientations.</li>
+		<li>Flipping the piece.</li>
+		<li>Rotating the piece 3 times to obtain four new unique rotational orientations.</li>
+		<li>Flipping the piece to end up back at its starting orientation.</li>
+	</ul>
+
+	<div class="highlight_container">
+		<PieceOrientations />
+	</div>
+
+	<p>
+		However, with only these three steps, not all valid solutions will be found. We also need to
+		account for holes in the top row of a puzzle piece. The rules for exhausting all of a piece's
+		orientations is now:
+	</p>
+	<ul>
+		<li>
+			If there is a hole in the top row of the piece, translate the piece to the left by 1 square.
+		</li>
+		<li>Else if the piece has not exhausted its rotations, rotate the piece by 90&#176.</li>
+		<li>
+			Else if the piece has exhausted its rotations, flip the piece if it can be flipped and has not
+			already been flipped.
+		</li>
+		<li>Else move on to next available puzzle piece.</li>
+	</ul>
+
+	<p>
+		The animation below shows how translating pieces to the left, if there are holes in the top row,
+		allows pieces to be placed on the board in valid positions which were previously unreachable
+		based on the old rules.
+	</p>
+
+	<div class="highlight_container">
+		<TranslatePiece />
+	</div>
+
+	<p>
+		Now by taking into account translations the number of permuations that need to be tested is
+		increased. The table below summaries the updated number of rotations, flips and translations for
+		each piece
+	</p>
+
+	<div class="highlight_container">
+		<table>
+			<colgroup>
+				<col span="1" style="width: 25%" />
+			</colgroup>
+			<tr>
+				<th>Pieces</th>
+				{#each table_pieces as piece}
+					<td>
+						<svg
+							width={(piece.width + piece.padding) * piece.draw_scale}
+							height={(piece.height + piece.padding) * piece.draw_scale}
+						>
+							<Piece {piece} />
+						</svg>
+					</td>
+				{/each}
+			</tr>
+			<tr>
+				<th>Rotations (R)</th>
+				<td>2</td>
+				{#each new Array(5) as i}
+					<td>4</td>
+				{/each}
+				<td>2</td>
+				<td>4</td>
+			</tr>
+			<tr>
+				<th>Flips (F)</th>
+				<td>1</td>
+				<td>1</td>
+				{#each new Array(5) as i}
+					<td>2</td>
+				{/each}
+				<td>1</td>
+			</tr>
+			<tr>
+				<th>Translations (T)</th>
+				<td>0</td>
+				<td>0</td>
+				<td>2</td>
+				<td>5</td>
+				<td>4</td>
+				<td>5</td>
+				<td>6</td>
+				<td>2</td>
+			</tr>
+			<tr>
+				<th>Total Unique Pieces (=R&#215;F+T) </th>
+				<td>2</td>
+				<td>4</td>
+				<td>10</td>
+				<td>13</td>
+				<td>12</td>
+				<td>13</td>
+				<td>10</td>
+				<td>6</td>
+			</tr>
+		</table>
+	</div>
+
+	<p>
+		Therefore, the total number of permuations using equations (1) and (2) is:
+		<Katex math={'\\boldsymbol{d} = (2, 4, 10, 13, 12, 13, 10, 6)'} displayMode={true} />
+		<Katex
+			math={'\\begin{equation} \\notag \\begin{split} P(8, \\boldsymbol{d}) &= 8! \\times \\prod_{i=0}^7\\boldsymbol{d}_i \\\\ &= 8! \\times (2 \\times 4 \\times 10 \\times 13 \\times 12 \\times 13 \\times 10 \\times 6) \\\\ &= 3.92491008 \\times 10^{11} \\end{split} \\end{equation}'}
+			displayMode={true}
+		/>
+	</p>
+
+	<h2>Writing the Alogrithm</h2>
+
+	<p>The solver Alogrithm is a depth first Alogrithm with branch pruning.</p>
+
+	<div class="highlight_container">
+		<p>Add Tree image</p>
+	</div>
 </div>
 
 <style>
@@ -321,6 +515,7 @@
 		text-align: left;
 		background-color: #2d5358;
 		border: 1px solid #ddd;
+		font-size: smaller;
 	}
 
 	td {
@@ -345,5 +540,13 @@
 		/* Centre vertically and horizontally */
 		display: flex;
 		align-items: center;
+	}
+
+	ul {
+		list-style-type: square;
+	}
+
+	li {
+		padding: 0.5rem 0;
 	}
 </style>

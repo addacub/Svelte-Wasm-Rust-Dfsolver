@@ -1,28 +1,28 @@
 <script lang="ts">
+	import type { Piece } from '$lib/about/piece';
 	import { getStrokeLightness } from '$lib/utils/utils';
-	import { table_draw_scale, table_svg_padding } from './store';
+
+	export let piece: Piece;
 
 	// Input properties
-	export let width: number;
-	export let height: number;
-	export let svg_path: string;
-	export let hsl: [number, number, number];
-
-	let draw_scale: number = $table_draw_scale;
-	let padding: number = $table_svg_padding;
-	let stroke_width: number = 0.05;
+	const width: number = piece.width;
+	const height: number = piece.height;
+	const svg_path: string = piece.path;
+	const stroke_width: number = piece.stroke_width;
+	const padding: number = piece.padding;
+	const draw_scale: number = piece.draw_scale;
+	const hsl: [number, number, number] = piece.fill;
 
 	// Styling variables
-	let fill: string = `hsl(${hsl[0]}, ${hsl[1]}%, ${hsl[2]}%)`;
-	let stroke: string = `hsl(${hsl[0]}, ${hsl[1]}%, ${getStrokeLightness(hsl[2])}%)`;
+	const fill: string = `hsl(${hsl[0]}, ${hsl[1]}%, ${hsl[2]}%)`;
+	const stroke: string = `hsl(${hsl[0]}, ${hsl[1]}%, ${getStrokeLightness(hsl[2])}%)`;
 </script>
 
-<svg
-	width={(width + padding * 2) * draw_scale}
-	height={(height + padding * 2) * draw_scale}
-	display="inline-block"
+<g
+	transform-origin={`${(width / 2 + padding) * draw_scale} ${(height / 2 + padding) * draw_scale}`}
 >
 	<path d={svg_path} {fill} />
+
 	<!-- Drawing vertical lines -->
 	{#each new Array(width + 1) as _, i}
 		<line
@@ -34,6 +34,7 @@
 			stroke-width={stroke_width * draw_scale}
 		/>
 	{/each}
+
 	<!-- Drawing horizontal lines -->
 	{#each new Array(height + 1) as _, i}
 		<line
@@ -45,4 +46,7 @@
 			stroke-width={stroke_width * draw_scale}
 		/>
 	{/each}
-</svg>
+
+	<!-- Custom animations go here -->
+	<slot />
+</g>

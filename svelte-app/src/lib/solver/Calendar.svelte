@@ -18,7 +18,7 @@
 	import {} from '$lib/solver/store';
 	import { get_board_index } from '$lib/solver/utils';
 
-	let months: String[] = [
+	let months: readonly String[] = [
 		'Jan',
 		'Feb',
 		'Mar',
@@ -138,17 +138,6 @@
 
 	// Purposely uses assignment to trigger function calls
 	let reactive_flag: boolean = true;
-
-	function get_colour(board_position: number, reactive_flag: boolean): string {
-		for (let i: number = 0; i < button_colour_groups.length; i++) {
-			if (button_colour_groups[i].includes(board_position)) {
-				console.log('Inside get colour function');
-				return $colour_classes[i];
-			}
-		}
-
-		return '';
-	}
 </script>
 
 <div class="calendar">

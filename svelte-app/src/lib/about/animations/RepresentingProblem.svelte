@@ -1,25 +1,17 @@
 <script lang="ts">
-	import { getStrokeLightness } from '$lib/utils/utils';
-	import { maxtrix_draw_scale, matrix_svg_padding, matrix_duration } from './store';
+	import { represented_piece } from '$lib/about/piece';
 	import Katex from '$lib/about/Katex.svelte';
-	import { animated_piece } from '$lib/about/piece';
+	import Piece from '$lib/about/Piece.svelte';
 
 	// Input properties
-	let width: number = animated_piece.get_width();
-	let height: number = animated_piece.get_height();
-	let svg_path: string = animated_piece.get_path();
-	let hsl: [number, number, number] = animated_piece.get_fill();
+	const width: number = represented_piece.width;
+	const height: number = represented_piece.height;
+	const padding: number = represented_piece.padding;
+	const draw_scale: number = represented_piece.draw_scale;
 
-	let draw_scale: number = $maxtrix_draw_scale;
-	let duration: number = $matrix_duration;
-	let spacing: number = 1;
-	let arrow_length: number = 3;
-
-	// Styling variables
-	let fill: string = `hsl(${hsl[0]}, ${hsl[1]}%, ${hsl[2]}%)`;
-	let stroke: string = `hsl(${hsl[0]}, ${hsl[1]}%, ${getStrokeLightness(hsl[2])}%)`;
-	let stroke_width: number = 0.05;
-	let padding: number = $matrix_svg_padding;
+	const duration: number = 8;
+	const spacing: number = 1.5;
+	const arrow_length: number = 3;
 </script>
 
 <div class="content">
@@ -28,45 +20,18 @@
 		height={(height + padding * 2) * draw_scale}
 	>
 		<!-- Initial Piece -->
-		<path d={svg_path} {fill} />
-		<!-- Drawing vertical lines -->
-		{#each new Array(width + 1) as _, i}
-			<line
-				x1={(i + padding) * draw_scale}
-				y1={(padding - stroke_width / 2) * draw_scale}
-				x2={(i + padding) * draw_scale}
-				y2={(height + padding + stroke_width / 2) * draw_scale}
-				{stroke}
-				stroke-width={stroke_width * draw_scale}
-			/>
-		{/each}
-
-		<!-- Drawing horizontal lines -->
-		{#each new Array(height + 1) as _, i}
-			<line
-				x1={(padding - stroke_width / 2) * draw_scale}
-				y1={(i + padding) * draw_scale}
-				x2={(padding + width + stroke_width / 2) * draw_scale}
-				y2={(i + padding) * draw_scale}
-				{stroke}
-				stroke-width={stroke_width * draw_scale}
-			/>
-		{/each}
+		<Piece piece={represented_piece} />
 
 		<!-- Adding numbers -->
-		{#each new Array(height) as _, y}
-			{#each new Array(width) as _, x}
+		{#each new Array(height) as _, row}
+			{#each new Array(width) as _, col}
 				<text
 					class="numbers"
 					style="animation-duration: {duration}s;"
-					x={(padding + 1 / 2 + x) * draw_scale}
-					y={(padding + 1 / 2 + y) * draw_scale}
-					fill="none"
-					text-anchor="middle"
-					dominant-baseline="middle"
-					font-size="x-large"
+					x={(padding + 1 / 2 + col) * draw_scale}
+					y={(padding + 1 / 2 + row) * draw_scale}
 				>
-					{x === 1 && y === 0 ? 0 : 1}
+					{width * row + col === 1 ? 0 : 1}
 				</text>
 			{/each}
 		{/each}
@@ -111,6 +76,12 @@
 		margin: auto;
 	}
 
+	svg > text {
+		text-anchor: middle;
+		dominant-baseline: middle;
+		font-size: x-large;
+	}
+
 	.numbers {
 		animation-name: number-fadein;
 		animation-iteration-count: infinite;
@@ -127,8 +98,11 @@
 		30% {
 			fill: rgba(255, 255, 255, 1);
 		}
-		100% {
+		90% {
 			fill: rgba(255, 255, 255, 1);
+		}
+		100% {
+			fill: rgba(255, 255, 255, 0);
 		}
 	}
 
@@ -148,8 +122,11 @@
 		50% {
 			fill: rgba(255, 255, 255, 1);
 		}
-		100% {
+		90% {
 			fill: rgba(255, 255, 255, 1);
+		}
+		100% {
+			fill: rgba(255, 255, 255, 0);
 		}
 	}
 
@@ -169,8 +146,11 @@
 		50% {
 			stroke: rgba(255, 255, 255, 1);
 		}
-		100% {
+		90% {
 			stroke: rgba(255, 255, 255, 1);
+		}
+		100% {
+			stroke: rgba(255, 255, 255, 0);
 		}
 	}
 
@@ -193,8 +173,11 @@
 		70% {
 			color: rgba(255, 255, 255, 1);
 		}
-		100% {
+		90% {
 			color: rgba(255, 255, 255, 1);
+		}
+		100% {
+			color: rgba(255, 255, 255, 0);
 		}
 	}
 </style>
