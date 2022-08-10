@@ -76,7 +76,6 @@
 		});
 
 		key_times.push(1);
-		console.log(key_times);
 		return key_times.map(String).join(';');
 	}
 

@@ -35,8 +35,12 @@
 
 <style>
 	header {
+		/* background-color: var(--primary-color); */
+		position: fixed;
+		width: 100%;
 		display: flex;
 		justify-content: space-between;
+		z-index: 1;
 	}
 
 	.corner {
@@ -61,7 +65,7 @@
 	nav {
 		display: flex;
 		justify-content: center;
-		--background: rgba(255, 255, 255, 0.7);
+		--background: #babdc0;
 	}
 
 	svg {
@@ -122,7 +126,7 @@
 		color: var(--accent-color);
 	}
 
-	@media screen and (max-height: 760px) and (orientation: landscape) {
+	/* @media screen and (max-height: 760px) and (orientation: landscape) {
 		svg {
 			width: 1em;
 			height: 1.5em;
@@ -144,5 +148,5 @@
 		ul {
 			height: 2em;
 		}
-	}
+	} */
 </style>

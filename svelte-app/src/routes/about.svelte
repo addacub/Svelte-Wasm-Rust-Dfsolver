@@ -24,6 +24,7 @@
 	import ValidMove from '$lib/about/animations/ValidMove.svelte';
 	import TranslatePiece from '$lib/about/animations/TranslatePiece.svelte';
 	import PieceOrientations from '$lib/about/animations/PieceOrientations.svelte';
+	import graphStream_webm from '$lib/assets/graphStreamMovie.webm';
 </script>
 
 <svelte:head>
@@ -112,7 +113,7 @@
 	<p>
 		By taking into the account rotations and flips, each puzzle piece is actually 1 of 8 unique
 		pieces which can be placed. Now, a permutation can be described as traversing through a tree
-		like structure where:
+		structure where:
 	</p>
 	<ul>
 		<li>A <b>node</b> corresponds to the piece that is placed.</li>
@@ -340,9 +341,11 @@
 	</ul>
 
 	<p>
-		Note, if a piece is flipped, the number of rotations it undergo is reset. Refer to the tables
-		for how many rotations and flips each piece can undergo. The below animation shows how a piece's
-		orientation is exhausted. The steps consist of:
+		Note, the number of rotations is for each side of a piece if it is flippable. I.e. Each side has <i
+			>n</i
+		> unique rotational orientations. Refer to the tables for how many rotations and flips each piece
+		can undergo. The below animation shows how a piece's orientation is exhausted. The steps consist
+		of:
 	</p>
 
 	<ul>
@@ -461,11 +464,92 @@
 
 	<h2>Writing the Alogrithm</h2>
 
-	<p>The solver Alogrithm is a depth first Alogrithm with branch pruning.</p>
+	<p>
+		The solver alogrithm is a depth-first tree traversal with branch pruning. The video below is a
+		visualtion of how the solver traverses through the tree of the possible permuations. The tree
+		only contains the first 4 levels (i.e. the first 4 pieces being placed) with the order of piece
+		shape fixed. The root node, L0, corresponds to an empty board (i.e. no pieces have been placed).
+		The node levels and the pieces they represent are summarised in the table below:
+	</p>
+	<div class="highlight_container">
+		<table>
+			<colgroup>
+				<col span="1" style="width: 25%" />
+			</colgroup>
+			<tr>
+				<th>Level</th>
+				<td>0</td>
+				{#each table_pieces as _, i}
+					<td>L{i + 1}</td>
+				{/each}
+			</tr>
+			<tr>
+				<th>Pieces</th>
+				<td>-</td>
+				{#each table_pieces as piece, index}
+					<td>
+						<svg
+							width={(piece.width + piece.padding) * piece.draw_scale}
+							height={(piece.height + piece.padding) * piece.draw_scale}
+						>
+							<Piece {piece} />
+						</svg>
+					</td>
+				{/each}
+			</tr>
+			<tr>
+				<th>Total Unique Pieces </th>
+				<td>-</td>
+				<td>2</td>
+				<td>4</td>
+				<td>10</td>
+				<td>13</td>
+				<td>12</td>
+				<td>13</td>
+				<td>10</td>
+				<td>6</td>
+			</tr>
+		</table>
+	</div>
+
+	<p>
+		Traversing through the tree is as follows. Starting with an empty board (i.e. at L0) a piece is
+		attempted to be placed at the next available square on the board (i.e. visit a node at L1). If
+		placing that piece is valid, another piece is attempted to be placed at the next available
+		square on the board (i.e. visit a node at L2 connected to the previously visited L1 node). If
+		placing the piece is not valid, remove that piece and try another piece (i.e. the visited L2
+		node can be pruned and all its child nodes do not need to be visited. Visit another L2 node
+		connected to the previously visited L1 node). These steps are repeated until the whole tree has
+		been traversed.
+	</p>
+	<p>Note the following:</p>
+	<ul>
+		<li>
+			Orange nodes are nodes which are currently being visited (i.e. testing if placing that piece
+			on the next available square on the board is valid).
+		</li>
+		<li>Red nodes are nodes which have already been visited (i.e. tested if vaild).</li>
+		<li>Gray nodes are nodes which been pruned.</li>
+		<li>
+			Branch pruning is arbitrary and is only for visulation purposes. It does not correspond to an
+			actual solution.
+		</li>
+	</ul>
 
 	<div class="highlight_container">
-		<p>Add Tree image</p>
+		<video width="100%" height="100%" autoplay muted controls loop src={graphStream_webm}>
+			A video of a tree graph undergoing a depth first Alogrithm. As each node is visited, it turns
+			red. If it is a invalid permutation, it is pruned, and all of its children nodes turn a
+			transluscent gray.
+		</video>
 	</div>
+
+	<p>
+		The full tree for the fixed order of pieces as shown in the table above would have an additional
+		4 levels (L0 - L8). And 8! (8 factorial) of these trees (excluding the root node) would be
+		needed to account for the permuations of the order of the pieces placed. Refer to Equation 1 and
+		Equation 2.
+	</p>
 </div>
 
 <style>
