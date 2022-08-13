@@ -1,0 +1,15 @@
+{
+  "name": "wasm-dfsolver",
+  "collaborators": [
+    "addacub <addacu@gmail.com>"
+  ],
+  "version": "0.1.0",
+  "files": [
+    "wasm_dfsolver_bg.wasm",
+    "wasm_dfsolver.js",
+    "wasm_dfsolver.d.ts"
+  ],
+  "module": "wasm_dfsolver.js",
+  "types": "wasm_dfsolver.d.ts",
+  "sideEffects": false
+}

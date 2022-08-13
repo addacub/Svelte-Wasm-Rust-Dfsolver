@@ -142,7 +142,9 @@ impl PieceModel {
     /// If there are zeros in the top row of the piece, the piece will be
     /// incrementally translated until a value of 1 is at the board position.
     fn translate(&mut self) {
-        if !self.is_translation_exhausted() {
+
+        // Loop while piece can still be translated
+        while !self.is_translation_exhausted() {
             self.translation_count += 1;
         }
     }
@@ -399,23 +401,6 @@ mod tests {
         assert_eq!(piece.rotation_count, 3);
         assert_eq!(piece.has_flipped, true);
         assert_eq!(piece.orientation_exhausted, true);
-    }
-
-    #[test]
-    fn translate_piece_once() {
-        // Arrange
-        let mut piece = PieceModel::new(
-            "2x4 Tee".to_string(),
-            array2D!([0, 0, 1, 0], [1, 1, 1, 1]),
-            3,
-            true,
-        );
-
-        // Act
-        piece.translate();
-
-        // Assert
-        assert_eq!(piece.translation_count, 1);
     }
 
     #[test]
