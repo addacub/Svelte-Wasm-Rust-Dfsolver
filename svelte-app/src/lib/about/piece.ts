@@ -7,7 +7,10 @@ import {
     matrix_svg_padding,
     board_draw_scale,
     board_svg_padding,
-    board_svg_stroke_width
+    board_svg_stroke_width,
+    orient_draw_scale,
+    orient_svg_padding,
+    orient_svg_stroke_width
 } from '$lib/about/store'
 
 // Initialising variables
@@ -22,6 +25,10 @@ let matrix_padding: number = 1;
 let board_scale: number = 1;
 let board_stroke_width: number = 1;
 let board_padding: number = 1;
+
+let orient_scale: number = 1;
+let orient_stroke_width: number = 1;
+let orient_padding: number = 1;
 
 // Subscribing to store values
 table_draw_scale.subscribe(value => {
@@ -60,7 +67,20 @@ board_svg_padding.subscribe(value => {
     board_padding = value
 })
 
-export class Piece {
+orient_draw_scale.subscribe(value => {
+    orient_scale = value
+});
+
+orient_svg_stroke_width.subscribe(value => {
+    orient_stroke_width = value
+})
+
+orient_svg_padding.subscribe(value => {
+    orient_padding = value
+})
+
+
+export class PieceInfo {
     readonly width: number;
     readonly height: number;
     readonly path: string;
@@ -80,22 +100,93 @@ export class Piece {
     }
 }
 
+enum PieceType {
+    no_hole_2x3,
+    middle_hole_2x3,
+    end_hole_2x3,
+    tee_2x4,
+    L_2x4,
+    zig_zag_2x4,
+    zig_zag_3x3,
+    L_3x3
+}
+
+function create_no_hole_2x3(padding: number, scale: number, stroke_width: number): PieceInfo {
+    return new PieceInfo(3, 2, `m${padding * scale},${padding * scale} h${3 * scale} v${2 * scale} h${-3 * scale} z`, stroke_width, padding, scale, [149, 88, 41])
+}
+
+function create_middle_hole_2x3(padding: number, scale: number, stroke_width: number): PieceInfo {
+    return new PieceInfo(3, 2, `m${padding * scale},${padding * scale} h${1 * scale} v${1 * scale} h${1 * scale} v${-1 * scale} h${1 * scale} v${2 * scale} h${-3 * scale} z`, stroke_width, padding, scale, [290, 100, 60])
+}
+
+function create_end_hole_2x3(padding: number, scale: number, stroke_width: number): PieceInfo {
+    return new PieceInfo(3, 2, `m${padding * scale},${padding * scale} h${2 * scale} v${1 * scale} h${1 * scale} v${1 * scale} h${-3 * scale} z`, stroke_width, padding, scale, [172, 100, 68])
+}
+
+function create_tee_2x4(padding: number, scale: number, stroke_width: number): PieceInfo {
+    return new PieceInfo(4, 2, `m${padding * scale},${padding * scale} h${4 * scale} v${1 * scale} h${-2 * scale} v${1 * scale} h${-1 * scale} v${-1 * scale} h${-1 * scale} z`, stroke_width, padding, scale, [104, 99, 72])
+}
+
+function create_L_2x4(padding: number, scale: number, stroke_width: number): PieceInfo {
+    return new PieceInfo(4, 2, `m${padding * scale},${padding * scale} h${4 * scale} v${2 * scale} h${-1 * scale} v${-1 * scale} h${-3 * scale} z`, stroke_width, padding, scale, [345, 100, 64])
+}
+
+function create_zig_zag_2x4(padding: number, scale: number, stroke_width: number): PieceInfo {
+    return new PieceInfo(4, 2, `m${padding * scale},${padding * scale} h${3 * scale} v${1 * scale} h${1 * scale} v${1 * scale} h${-2 * scale} v${-1 * scale} h${-2 * scale} z`, stroke_width, padding, scale, [0, 100, 56])
+}
+
+function create_zig_zag_3x3(padding: number, scale: number, stroke_width: number): PieceInfo {
+    return new PieceInfo(3, 3, `m${padding * scale},${padding * scale} h${2 * scale} v${2 * scale} h${1 * scale} v${1 * scale} h${-2 * scale} v${-2 * scale} h${-1 * scale} z`, stroke_width, padding, scale, [58, 100, 44])
+}
+
+function create_L_3x3(padding: number, scale: number, stroke_width: number): PieceInfo {
+    return new PieceInfo(3, 3, `m${padding * scale},${padding * scale} h${1 * scale} v${2 * scale} h${2 * scale} v${1 * scale} h${-3 * scale} z`, stroke_width, padding, scale, [212, 100, 64])
+}
+
+function create_piece(piece_type: PieceType, padding: number, scale: number, stroke_width: number): PieceInfo {
+    switch (piece_type) {
+        case PieceType.no_hole_2x3:
+            return create_no_hole_2x3(padding, scale, stroke_width);
+        case PieceType.middle_hole_2x3:
+            return create_middle_hole_2x3(padding, scale, stroke_width);
+        case PieceType.end_hole_2x3:
+            return create_end_hole_2x3(padding, scale, stroke_width);
+        case PieceType.zig_zag_2x4:
+            return create_zig_zag_2x4(padding, scale, stroke_width);
+        case PieceType.tee_2x4:
+            return create_tee_2x4(padding, scale, stroke_width);
+        case PieceType.L_2x4:
+            return create_L_2x4(padding, scale, stroke_width);
+        case PieceType.zig_zag_3x3:
+            return create_zig_zag_3x3(padding, scale, stroke_width);
+        case PieceType.L_3x3:
+            return create_L_3x3(padding, scale, stroke_width);
+    }
+}
+
 // Define puzzle pieces to be used in tables
-export let table_pieces: readonly Piece[] = [
-    new Piece(3, 2, `m${table_padding * table_scale},${table_padding * table_scale} h${3 * table_scale} v${2 * table_scale} h${-3 * table_scale} z`, table_stroke_width, table_padding, table_scale, [149, 88, 41]),
-    new Piece(3, 2, `m${table_padding * table_scale},${table_padding * table_scale} h${1 * table_scale} v${1 * table_scale} h${1 * table_scale} v${-1 * table_scale} h${1 * table_scale} v${2 * table_scale} h${-3 * table_scale} z`, table_stroke_width, table_padding, table_scale, [290, 100, 60]),
-    new Piece(3, 2, `m${table_padding * table_scale},${table_padding * table_scale} h${2 * table_scale} v${1 * table_scale} h${1 * table_scale} v${1 * table_scale} h${-3 * table_scale} z`, table_stroke_width, table_padding, table_scale, [172, 100, 68]),
-    new Piece(4, 2, `m${table_padding * table_scale},${table_padding * table_scale} h${4 * table_scale} v${1 * table_scale} h${-2 * table_scale} v${1 * table_scale} h${-1 * table_scale} v${-1 * table_scale} h${-1 * table_scale} z`, table_stroke_width, table_padding, table_scale, [104, 99, 72]),
-    new Piece(4, 2, `m${table_padding * table_scale},${table_padding * table_scale} h${4 * table_scale} v${2 * table_scale} h${-1 * table_scale} v${-1 * table_scale} h${-3 * table_scale} z`, table_stroke_width, table_padding, table_scale, [345, 100, 64]),
-    new Piece(4, 2, `m${table_padding * table_scale},${table_padding * table_scale} h${3 * table_scale} v${1 * table_scale} h${1 * table_scale} v${1 * table_scale} h${-2 * table_scale} v${-1 * table_scale} h${-2 * table_scale} z`, table_stroke_width, table_padding, table_scale, [0, 100, 56]),
-    new Piece(3, 3, `m${table_padding * table_scale},${table_padding * table_scale} h${2 * table_scale} v${2 * table_scale} h${1 * table_scale} v${1 * table_scale} h${-2 * table_scale} v${-2 * table_scale} h${-1 * table_scale} z`, table_stroke_width, table_padding, table_scale, [58, 100, 44]),
-    new Piece(3, 3, `m${table_padding * table_scale},${table_padding * table_scale} h${1 * table_scale} v${2 * table_scale} h${2 * table_scale} v${1 * table_scale} h${-3 * table_scale} z`, table_stroke_width, table_padding, table_scale, [212, 100, 64])
+export let table_pieces: readonly PieceInfo[] = [
+    create_piece(PieceType.no_hole_2x3, table_padding, table_scale, table_stroke_width),
+    create_piece(PieceType.middle_hole_2x3, table_padding, table_scale, table_stroke_width),
+    create_piece(PieceType.end_hole_2x3, table_padding, table_scale, table_stroke_width),
+    create_piece(PieceType.tee_2x4, table_padding, table_scale, table_stroke_width),
+    create_piece(PieceType.L_2x4, table_padding, table_scale, table_stroke_width),
+    create_piece(PieceType.zig_zag_2x4, table_padding, table_scale, table_stroke_width),
+    create_piece(PieceType.zig_zag_3x3, table_padding, table_scale, table_stroke_width),
+    create_piece(PieceType.L_3x3, table_padding, table_scale, table_stroke_width)
 ]
 
+// Define puzzle piece to display unique orientations
+export const zig_zag_2x4_med: PieceInfo = create_piece(PieceType.zig_zag_2x4, orient_padding, orient_scale, orient_stroke_width);
+
+// Define puzzle piece for rotational and reflection symmetry
+export const no_hole_2x3_sym = create_piece(PieceType.no_hole_2x3, board_padding, board_scale, board_stroke_width);
+
 // Define puzzle piece to be used in how to represent demo
-export const represented_piece: Piece = new Piece(3, 2, `m${matrix_padding * matrix_scale},${matrix_padding * matrix_scale} h${1 * matrix_scale} v${1 * matrix_scale} h${1 * matrix_scale} v${-1 * matrix_scale} h${1 * matrix_scale} v${2 * matrix_scale} h${-3 * matrix_scale} z`, matrix_stroke_width, matrix_padding, matrix_scale, [290, 100, 60])
+export const middle_hole_2x3_rep: PieceInfo = create_piece(PieceType.middle_hole_2x3, matrix_padding, matrix_scale, matrix_stroke_width);
+
 
 // Define puzzle pieces to be used in how to place pieces demo
-export const end_hole_2x3: Piece = new Piece(3, 2, `m${board_padding * board_scale},${board_padding * board_scale} h${3 * board_scale} v${1 * board_scale} h${-1 * board_scale} v${1 * board_scale} h${-2 * board_scale} z`, board_stroke_width, board_padding, board_scale, [172, 100, 68]);
-export const middle_hole_2x3: Piece = new Piece(3, 2, `m${board_padding * board_scale},${board_padding * board_scale} h${1 * board_scale} v${1 * board_scale} h${1 * board_scale} v${-1 * board_scale} h${1 * board_scale} v${2 * board_scale} h${-3 * board_scale} z`, board_stroke_width, board_padding, board_scale, [290, 100, 60])
-export const zig_zag_2x4: Piece = new Piece(4, 2, `m${board_padding * board_scale},${(board_padding + 1) * board_scale} h${1 * board_scale} v${-1 * board_scale} h${3 * board_scale} v${1 * board_scale} h${-2 * board_scale} v${1 * board_scale} h${-2 * board_scale} z`, table_stroke_width, board_padding, board_scale, [0, 100, 56])
+export const end_hole_2x3_big: PieceInfo = create_piece(PieceType.end_hole_2x3, board_padding, board_scale, board_stroke_width);
+export const middle_hole_2x3_big: PieceInfo = create_piece(PieceType.middle_hole_2x3, board_padding, board_scale, board_stroke_width);
+export const zig_zag_2x4_big: PieceInfo = create_piece(PieceType.zig_zag_2x4, board_padding, board_scale, board_stroke_width);

@@ -2,15 +2,19 @@
 	import Board from '$lib/about/Board.svelte';
 	import { board } from '$lib/about/board';
 	import Piece from '../Piece.svelte';
-	import { end_hole_2x3, zig_zag_2x4 } from '../piece';
+	import { end_hole_2x3_big, zig_zag_2x4_big } from '../piece';
+	import type { PieceInfo } from '../piece';
 
 	// Input properties
-	const width: number = board.width + zig_zag_2x4.width;
-	const height: number = board.height;
-	const stroke_width: number = board.stroke_width;
+	const existing_piece: PieceInfo = end_hole_2x3_big;
+	const translating_piece: PieceInfo = zig_zag_2x4_big;
 	const padding: number = board.padding;
-	const draw_scale: number = board.draw_scale;
 	const spacing: number = 2;
+	const viewBox_width: number = board.width + translating_piece.width + padding * 2 + spacing;
+	const viewBox_height: number = board.height + padding * 2;
+	const stroke_width: number = board.stroke_width;
+
+	const draw_scale: number = board.draw_scale;
 
 	const duration: number = 10; // duration of animation in seconds
 
@@ -116,10 +120,7 @@
 </script>
 
 <div class="content">
-	<svg
-		width={(width + padding * 2 + spacing) * draw_scale}
-		height={(height + padding * 2) * draw_scale}
-	>
+	<svg width={viewBox_width * draw_scale} height={viewBox_height * draw_scale}>
 		<!-- Board -->
 		<Board {board}>
 			<!-- Board Highlight -->
@@ -148,10 +149,11 @@
 		</Board>
 
 		<!-- Existing Piece -->
-		<Piece piece={end_hole_2x3} />
+		<Piece piece={existing_piece} scale="1 -1" />
 
 		<!-- New Piece -->
-		<Piece piece={zig_zag_2x4}>
+		<g>
+			<Piece piece={translating_piece} rotate_deg={0} scale="-1 1" />
 			<animateTransform
 				attributeName="transform"
 				dur={`${duration}s`}
@@ -162,7 +164,7 @@
 				keySplines={move_spline}
 				repeatCount="indefinite"
 			/>
-		</Piece>
+		</g>
 
 		<!-- Piece Highlight -->
 		<rect

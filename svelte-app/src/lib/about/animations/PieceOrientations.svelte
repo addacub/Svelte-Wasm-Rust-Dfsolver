@@ -1,18 +1,20 @@
 <script lang="ts">
 	import Piece from '../Piece.svelte';
-	import { zig_zag_2x4 } from '../piece';
+	import { zig_zag_2x4_big } from '../piece';
+	import type { PieceInfo } from '../piece';
 
 	// Input properties
-	const width: number = zig_zag_2x4.width;
-	const height: number = zig_zag_2x4.height;
+	const piece: PieceInfo = zig_zag_2x4_big;
+	const width: number = piece.width;
+	const height: number = piece.height;
 	const hypotenuse: number = Math.sqrt(width ** 2 + height ** 2);
-	const padding: number = zig_zag_2x4.padding;
-	const draw_scale: number = zig_zag_2x4.draw_scale;
+	const padding: number = piece.padding;
+	const draw_scale: number = piece.draw_scale;
 	const spacing: number = 1;
 	// Calculated properties
 	const viewBox_size: number = hypotenuse + padding * 2 + spacing;
 
-	const duration: number = 10; // duration of animation in seconds
+	const duration: number = 15; // duration of animation in seconds
 
 	/**
 	 * Stage 0: start  = 0
@@ -34,9 +36,9 @@
 	 * Stage 16: 0
 	 * Stage 17: end = 0
 	 */
-	const stages: number = 7;
+	const stages: number = 17;
 	const transition_weights: number[] = [
-		3, // pause
+		2, // pause
 		1, // rotate
 		1, // pause
 		1, // rotate
@@ -54,6 +56,30 @@
 		1, // flip
 		1 // end
 	];
+
+	const rotate_spline: string = [
+		'0 0 1 1',
+		'0.42 0 0.58 1',
+		'0 0 1 1',
+		'0.42 0 0.58 1',
+		'0 0 1 1',
+		'0.42 0 0.58 1',
+		'0 0 1 1',
+		'0.42 0 0.58 1',
+		'0 0 1 1',
+		'0.42 0 0.58 1',
+		'0 0 1 1',
+		'0.42 0 0.58 1',
+		'0 0 1 1'
+	].join(';');
+
+	const flip_spline: string = [
+		'0 0 1 1',
+		'0.42 0 0.58 1',
+		'0 0 1 1',
+		'0.42 0 0.58 1',
+		'0 0 1 1'
+	].join(';');
 
 	const frames: number = transition_weights.reduce((accumulator, current) => {
 		return accumulator + current;
@@ -107,7 +133,7 @@
             ${(viewBox_size / 2 - height / 2 - padding) * draw_scale}
             )`}
 		>
-			<Piece piece={zig_zag_2x4}>
+			<Piece {piece}>
 				<!-- Rotation animation -->
 				<animateTransform
 					attributeName="transform"
@@ -115,6 +141,8 @@
 					type="rotate"
 					values={get_rotate_values()}
 					keyTimes={get_keyTimes([1, 2, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14])}
+					calcMode="spline"
+					keySplines={rotate_spline}
 					repeatCount="indefinite"
 					additive="sum"
 				/>
@@ -124,6 +152,8 @@
 					type="scale"
 					values={get_flip_values()}
 					keyTimes={get_keyTimes([7, 8, 15, 16])}
+					calcMode="spline"
+					keySplines={flip_spline}
 					repeatCount="indefinite"
 					additive="sum"
 				/>

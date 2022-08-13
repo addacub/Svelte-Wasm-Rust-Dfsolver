@@ -1,26 +1,27 @@
 <script lang="ts">
-	import { represented_piece } from '$lib/about/piece';
+	import { middle_hole_2x3_rep } from '$lib/about/piece';
 	import Katex from '$lib/about/Katex.svelte';
 	import Piece from '$lib/about/Piece.svelte';
+	import type { PieceInfo } from '../piece';
 
 	// Input properties
-	const width: number = represented_piece.width;
-	const height: number = represented_piece.height;
-	const padding: number = represented_piece.padding;
-	const draw_scale: number = represented_piece.draw_scale;
+	const piece: PieceInfo = middle_hole_2x3_rep;
+	const width: number = piece.width;
+	const height: number = piece.height;
+	const padding: number = piece.padding;
+	const draw_scale: number = piece.draw_scale;
 
-	const duration: number = 8;
+	const duration: number = 10;
 	const spacing: number = 1.5;
 	const arrow_length: number = 3;
+	const viewBox_width: number = width + spacing * 2 + arrow_length + padding * 2;
+	const viewBox_height: number = height + padding * 2;
 </script>
 
 <div class="content">
-	<svg
-		width={(width + spacing * 2 + arrow_length + padding * 2) * draw_scale}
-		height={(height + padding * 2) * draw_scale}
-	>
+	<svg width={viewBox_width * draw_scale} height={viewBox_height * draw_scale}>
 		<!-- Initial Piece -->
-		<Piece piece={represented_piece} />
+		<Piece {piece} />
 
 		<!-- Adding numbers -->
 		{#each new Array(height) as _, row}
@@ -39,15 +40,17 @@
 		<!-- arrowhead marker definition  -->
 		<defs>
 			<marker
-				id="arrow-tip"
+				id="arrow-tip-piece"
 				class="arrow-tip"
 				style="animation-duration: {duration}s;"
 				viewBox="0 0 10 10"
-				refX="0"
+				refX="0.05"
 				refY="5"
 				markerWidth="3"
 				markerHeight="3"
-				orient="auto-start-reverse"
+				orient="auto"
+				stroke="none"
+				fill="none"
 			>
 				<path d="M 0 0 L 10 5 L 0 10 z" />
 			</marker>
@@ -61,7 +64,8 @@
 				arrow_length) *
 				draw_scale},{(height / 2) * draw_scale}"
 			fill="none"
-			marker-end="url(#arrow-tip)"
+			stroke="none"
+			marker-end="url(#arrow-tip-piece)"
 			stroke-width="12"
 		/>
 	</svg>

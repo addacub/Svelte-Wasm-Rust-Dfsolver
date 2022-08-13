@@ -2,15 +2,15 @@
 	import Board from '$lib/about/Board.svelte';
 	import { board } from '$lib/about/board';
 	import Piece from '../Piece.svelte';
-	import { end_hole_2x3, middle_hole_2x3 } from '../piece';
+	import { end_hole_2x3_big, middle_hole_2x3_big } from '../piece';
 
 	// Input properties
-	const width: number = board.width + middle_hole_2x3.width;
-	const height: number = board.height;
 	const stroke_width: number = board.stroke_width;
 	const padding: number = board.padding;
 	const draw_scale: number = board.draw_scale;
 	const spacing: number = 2;
+	const viewBox_width: number = board.width + middle_hole_2x3_big.width + padding * 2 + spacing;
+	const viewBox_height: number = board.height + padding * 2;
 
 	const duration: number = 10; // duration of animation in seconds
 
@@ -102,10 +102,7 @@
 </script>
 
 <div class="content">
-	<svg
-		width={(width + padding * 2 + spacing) * draw_scale}
-		height={(height + padding * 2) * draw_scale}
-	>
+	<svg width={viewBox_width * draw_scale} height={viewBox_height * draw_scale}>
 		<!-- Board -->
 		<Board {board}>
 			<!-- Board Highlight -->
@@ -134,10 +131,10 @@
 		</Board>
 
 		<!-- Existing Piece -->
-		<Piece piece={end_hole_2x3} />
+		<Piece piece={end_hole_2x3_big} scale="1 -1" />
 
 		<!-- New Piece -->
-		<Piece piece={middle_hole_2x3}>
+		<Piece piece={middle_hole_2x3_big}>
 			<animateTransform
 				attributeName="transform"
 				dur={`${duration}s`}

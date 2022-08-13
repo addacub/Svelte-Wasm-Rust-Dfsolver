@@ -8,6 +8,8 @@
 	const stroke_width: number = board.stroke_width;
 	const padding: number = board.padding;
 	const draw_scale: number = board.draw_scale;
+	const viewBox_width: number = width + padding * 2;
+	const viewBox_height: number = height + padding * 2;
 
 	const duration: number = 20; // duration of animation in seconds
 
@@ -72,7 +74,7 @@
 </script>
 
 <div class="content">
-	<svg width={(width + padding * 2) * draw_scale} height={(height + padding * 2) * draw_scale}>
+	<svg width={viewBox_width * draw_scale} height={viewBox_height * draw_scale}>
 		<!-- Board -->
 		<Board {board}>
 			<!-- Highlights -->

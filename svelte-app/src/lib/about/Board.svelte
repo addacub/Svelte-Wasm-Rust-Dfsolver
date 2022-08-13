@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { getStrokeLightness } from '$lib/utils/utils';
-	import type { Board } from '$lib/about/board';
+	import type { BoardInfo } from '$lib/about/board';
 
-	export let board: Board;
+	export let board: BoardInfo;
+	export let font_size: string = 'large';
 
 	// Input properties
 	const width: number = board.width;
@@ -80,6 +81,7 @@
 				class="months"
 				x={(padding + 1 / 2 + col) * draw_scale}
 				y={(padding + 1 / 2 + row) * draw_scale}
+				font-size={font_size}
 			>
 				{months[month_cols * row + col]}
 			</text>
@@ -93,6 +95,7 @@
 				class="months"
 				x={(padding + 1 / 2 + col) * draw_scale}
 				y={(padding + 1 / 2 + row + month_rows) * draw_scale}
+				font-size={font_size}
 			>
 				{day_cols * row + col < 31 ? day_cols * row + col + 1 : ''}
 			</text>
@@ -105,6 +108,5 @@
 		fill: black;
 		text-anchor: middle;
 		dominant-baseline: middle;
-		font-size: large;
 	}
 </style>

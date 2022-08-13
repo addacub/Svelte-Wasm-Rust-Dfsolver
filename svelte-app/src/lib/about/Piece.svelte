@@ -1,8 +1,10 @@
 <script lang="ts">
-	import type { Piece } from '$lib/about/piece';
+	import type { PieceInfo } from '$lib/about/piece';
 	import { getStrokeLightness } from '$lib/utils/utils';
 
-	export let piece: Piece;
+	export let piece: PieceInfo;
+	export let rotate_deg: number = 0;
+	export let scale: String = '1 1';
 
 	// Input properties
 	const width: number = piece.width;
@@ -20,6 +22,7 @@
 
 <g
 	transform-origin={`${(width / 2 + padding) * draw_scale} ${(height / 2 + padding) * draw_scale}`}
+	transform={`rotate(${rotate_deg}) scale(${scale})`}
 >
 	<path d={svg_path} {fill} />
 
