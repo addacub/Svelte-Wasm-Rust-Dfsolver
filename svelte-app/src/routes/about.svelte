@@ -15,7 +15,7 @@
 	import TranslatePiece from '$lib/about/animations/TranslatePiece.svelte';
 	import PieceOrientations from '$lib/about/animations/PieceOrientations.svelte';
 	import graphStream_webm from '$lib/assets/graphstreamMovie.webm';
-	import tree_Diagram from '$lib/assets/TreeDiagram.svg';
+	import tree_Diagram from '$lib/assets/TreeDiagram.png';
 	import UniqueOrientations from '$lib/about/animations/UniqueOrientations.svelte';
 	import RotationalSymmetry from '$lib/about/animations/RotationalSymmetry.svelte';
 	import ReflectionSymmetry from '$lib/about/animations/ReflectionSymmetry.svelte';
@@ -161,7 +161,7 @@
 	<p class="figure">
 		<i
 			>Figure {get_figure_count()}. A diagram of a tree structure with labelled parts: root node,
-			edge, parent node, child node, substree, leaf node, siblings and levels</i
+			edge, parent node, child node, sub-tree, leaf node, siblings and levels</i
 		>
 	</p>
 
@@ -204,7 +204,7 @@
 			of its 8 unique orientations.
 		</li>
 		<li>
-			<b>Subtree:</b> represents the descendants of a node.
+			<b>Sub-tree:</b> represents the descendants of a node.
 		</li>
 		<li>
 			<b>Traversal:</b> the process of visiting each node in the tree exactly once.
@@ -280,7 +280,7 @@
 	</div>
 
 	<p>
-		Therefore, the total number of permuations using equations (1) and (2) is:
+		Therefore, the total number of permutations using equations (1) and (2) is:
 		<Katex math={'\\boldsymbol{d} = (8, 8, 8, 8, 8, 8, 8, 8)'} displayMode={true} />
 		<Katex
 			math={'\\begin{equation} \\notag \\begin{split} P(8, \\boldsymbol{d}) &= 8! \\times \\prod_{i=0}^7\\boldsymbol{d}_i \\\\ &= 8! \\times (8 \\times 8 \\times 8 \\times 8 \\times 8 \\times 8 \\times 8 \\times 8) \\\\ &= 6.7645734912 \\times 10^{11} \\end{split} \\end{equation}'}
@@ -314,13 +314,14 @@
 	<p class="figure">
 		<i
 			>Figure {get_figure_count()}. The reflection symmetry of the 2&#215;3 rectangular piece. Its
-			mirror image appears unchanged and can be overlaid ontop of the original image.
+			mirror image appears unchanged and can be overlaid on top of the original image.
 		</i>
 	</p>
 
 	<p>
-		Therefore, by taking into account the symmetry, the number of permuations that need to be tested
-		is reduced. The table below summaries the updated number of rotations and flips for each piece
+		Therefore, by taking into account the symmetry, the number of permutations that need to be
+		tested is reduced. The table below summaries the updated number of rotations and flips for each
+		piece
 	</p>
 
 	<p>
@@ -380,7 +381,7 @@
 	</div>
 
 	<p>
-		Therefore, the total number of permuations using equations (1) and (2) is:
+		Therefore, the total number of permutations using equations (1) and (2) is:
 		<Katex math={'\\boldsymbol{d} = (2, 4, 8, 8, 8, 8, 4, 4)'} displayMode={true} />
 		<Katex
 			math={'\\begin{equation} \\notag \\begin{split} P(8, \\boldsymbol{d}) &= 8! \\times \\prod_{i=0}^7\\boldsymbol{d}_i \\\\ &= 8! \\times (2 \\times 4 \\times 8 \\times 8 \\times 8 \\times 8 \\times 4 \\times 4) \\\\ &= 2.113929216 \\times 10^{10} \\end{split} \\end{equation}'}
@@ -432,7 +433,7 @@
 		<li>Will the puzzle piece go outside the bounds of the puzzle board?</li>
 		<li>
 			Will the piece overlap with any pieces that have been placed or the target date (target date
-			is a filled sqaure)?
+			is a filled square)?
 		</li>
 		<li>Will placing the piece leave any unreachable holes?</li>
 	</ul>
@@ -445,7 +446,7 @@
 	<p>
 		<b>
 			If the answer to any of the above questions is yes, the position is not valid and the piece in
-			its current unique orienation cannot be placed.
+			its current unique orientation cannot be placed.
 		</b>
 	</p>
 
@@ -462,8 +463,8 @@
 	<p class="figure">
 		<i
 			>Figure {get_figure_count()}. Placing the 2&#215;3 middle hole piece at the next available
-			board position results in a unreachable hole at the "May" sqaure. Hence, placing that piece in
-			its current unique orienation is not valid.
+			board position results in a unreachable hole at the "May" square. Hence, placing that piece in
+			its current unique orientation is not valid.
 		</i>
 	</p>
 
@@ -485,7 +486,7 @@
 	</ul>
 
 	<p>
-		Note, the number of rotations is for each side of a piece if it is flippable. I.e. Each side has <i
+		Note, the number of rotations is for each side of a piece if it is flippable. I.e. each side has <i
 			>n</i
 		> unique rotational orientations. Refer to the tables for how many rotations and flips each piece
 		can undergo. The below animation shows how a piece's orientation is exhausted. The steps consist
@@ -549,14 +550,15 @@
 		</i>
 	</p>
 
-	<h2>Writing the Alogrithm</h2>
+	<h2>Writing the Algorithm</h2>
 
 	<p>
-		The solver alogrithm is a depth-first tree traversal with branch pruning. The video below is a
-		visualtion of how the solver traverses through the tree of the possible permuations. The tree
-		only contains the first 4 levels (i.e. the first 4 pieces being placed) with the order of piece
-		shape fixed. The root node, L0, corresponds to an empty board (i.e. no pieces have been placed).
-		The node levels and the pieces they represent are summarised in the table below:
+		The solver algorithm is a depth-first tree traversal with branch pruning. The video below
+		(Figure {figure_count + 1}) is a visualisation of how the solver traverses through the tree of
+		the possible permutations. The tree only contains the first 4 levels (i.e. the first 4 pieces
+		being placed) with the order of piece shape fixed. The root node, L0, corresponds to an empty
+		board (i.e. no pieces have been placed). The node levels and the pieces they represent are
+		summarised in the table below:
 	</p>
 
 	<p>
@@ -629,11 +631,11 @@
 			Orange nodes are nodes which are currently being visited (i.e. testing if placing that piece's
 			unique orientation on the next available square on the board is valid).
 		</li>
-		<li>Red nodes are nodes which have already been visited (i.e. tested if vaild).</li>
-		<li>Gray nodes are nodes which been pruned.</li>
+		<li>Red nodes are nodes which have already been visited (i.e. tested if valid).</li>
+		<li>Grey nodes are nodes which been pruned.</li>
 		<li>
-			Branch pruning is arbitrary and is only for visulation purposes. It does not correspond to an
-			actual solution.
+			Branch pruning is arbitrary and is only for visualisation purposes. It does not correspond to
+			an actual solution.
 		</li>
 	</ul>
 
@@ -644,23 +646,23 @@
 
 	<div class="highlight_container">
 		<video width="100%" height="100%" autoplay muted controls loop src={graphStream_webm}>
-			A video of a tree graph undergoing a depth first Alogrithm. As each node is visited, it turns
+			A video of a tree graph undergoing a depth first algorithm. As each node is visited, it turns
 			red. If it is a invalid permutation, it is pruned, and all of its child nodes turn a
-			transluscent gray.
+			translucent grey.
 		</video>
 	</div>
 	<p class="figure">
 		<i
-			>Figure {get_figure_count()}. A video of tree traversal using a depth first Alogrithm. As each
+			>Figure {get_figure_count()}. A video of tree traversal using a depth first algorithm. As each
 			node is visited, it turns red. If it is a invalid permutation, it is pruned, and all of its
-			children nodes turn a transluscent gray.
+			children nodes turn a translucent grey.
 		</i>
 	</p>
 
 	<p>
 		The full tree for the fixed order of pieces as shown in the <i>Table {table_count}</i> has an additional
 		4 levels (L5 - L8). And 8! (8 factorial) of these trees with the same the root node are needed to
-		account for the permuations of the order of the pieces placed (i.e. when changing the order at which
+		account for the permutations of the order of the pieces placed (i.e. when changing the order at which
 		pieces are placed). Refer to Equation 1 and Equation 2.
 	</p>
 </div>
