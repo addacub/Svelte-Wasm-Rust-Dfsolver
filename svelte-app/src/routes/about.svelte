@@ -732,7 +732,8 @@
 		<i
 			>Figure {increment_figure_count()}. A video of tree traversal using a depth first algorithm.
 			As each node is visited, it turns red. If it is a invalid permutation, it is pruned, and all
-			of its children nodes turn a translucent grey.
+			of its children nodes turn a translucent grey. This video was created using the
+			<a href="https://graphstream-project.org/" target="_blank">GraphStream</a> Java library.
 		</i>
 	</p>
 
