@@ -16,10 +16,14 @@
 	const arrow_length: number = 3;
 	const viewBox_width: number = width + spacing * 2 + arrow_length + padding * 2;
 	const viewBox_height: number = height + padding * 2;
+
+	function get_matrix(): string {
+		return 'M\\bigg\\lbrace \\overbrace{\\begin{bmatrix} 1 & 0 & 1 \\\\ 1 & 1 & 1 \\end{bmatrix}}^{\\text{N}}';
+	}
 </script>
 
 <div class="content">
-	<svg width={viewBox_width * draw_scale} height={viewBox_height * draw_scale}>
+	<svg width="90%" viewBox="0 0 {viewBox_width * draw_scale} {viewBox_height * draw_scale}">
 		<!-- Initial Piece -->
 		<Piece {piece} />
 
@@ -69,15 +73,17 @@
 			stroke-width="12"
 		/>
 	</svg>
-	<div class="katex-container" style="animation-duration: {duration}s;">
-		<Katex math={'\\begin{bmatrix} 1 & 0 & 1 \\\\ 1 & 1 & 1 \\end{bmatrix}'} displayMode={false} />
+	<div class="katex_container" style="animation-duration: {duration}s;">
+		<Katex math={get_matrix()} displayMode={false} />
 	</div>
 </div>
 
 <style>
 	div.content {
 		display: flex;
-		margin: auto;
+		align-items: center;
+		justify-content: center;
+		margin: 2% 5%;
 	}
 
 	svg > text {
@@ -158,12 +164,13 @@
 		}
 	}
 
-	div.katex-container {
-		margin: auto 0;
+	div.katex_container {
+		margin: auto;
 		font-size: xx-large;
 		position: relative;
 		animation-name: matrix-fadein;
 		animation-iteration-count: infinite;
+		padding-bottom: 3rem;
 	}
 
 	@keyframes matrix-fadein {
@@ -182,6 +189,13 @@
 		}
 		100% {
 			color: rgba(255, 255, 255, 0);
+		}
+	}
+
+	@media (max-width: 480px) {
+		div.katex_container {
+			font-size: small;
+			padding-bottom: 1.5rem;
 		}
 	}
 </style>

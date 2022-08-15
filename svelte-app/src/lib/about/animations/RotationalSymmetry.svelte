@@ -81,7 +81,7 @@
 </script>
 
 <div class="content">
-	<svg width={viewBox_size * draw_scale} height={viewBox_size * draw_scale}>
+	<svg width="40%" viewBox="0 0 {viewBox_size * draw_scale} {viewBox_size * draw_scale}">
 		<rect
 			x={(cx - width / 2) * draw_scale}
 			y={(cy - height / 2) * draw_scale}
@@ -146,6 +146,8 @@
 <style>
 	div.content {
 		display: flex;
+		align-items: center;
+		justify-content: center;
 		margin: auto;
 	}
 </style>

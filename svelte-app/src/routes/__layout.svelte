@@ -10,7 +10,7 @@
 </main>
 
 <footer>
-	<p>visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to learn SvelteKit</p>
+	<p>visit <a href="https://github.com/addacub">GitHub</a> to explore other projects</p>
 </footer>
 
 <style>
@@ -20,7 +20,7 @@
 		flex-direction: column;
 		padding: 2rem 1rem 1rem 1rem;
 		width: 100%;
-		max-width: 1024px;
+		max-width: fit-content;
 		margin: 0 auto;
 		box-sizing: border-box;
 		background-color: 19232D;

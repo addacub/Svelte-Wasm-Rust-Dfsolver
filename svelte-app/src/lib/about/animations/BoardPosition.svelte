@@ -74,7 +74,7 @@
 </script>
 
 <div class="content">
-	<svg width={viewBox_width * draw_scale} height={viewBox_height * draw_scale}>
+	<svg width="50%" viewBox="0 0 {viewBox_width * draw_scale} {viewBox_height * draw_scale}">
 		<!-- Board -->
 		<Board {board}>
 			<!-- Highlights -->
@@ -127,6 +127,8 @@
 <style>
 	div.content {
 		display: flex;
+		align-items: center;
+		justify-content: center;
 		margin: auto;
 	}
 </style>

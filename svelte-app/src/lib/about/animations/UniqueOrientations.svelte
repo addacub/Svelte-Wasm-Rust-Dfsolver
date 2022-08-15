@@ -5,9 +5,9 @@
 	// Input properties
 	const spacing: number = 1;
 	const padding: number = zig_zag_2x4_med.padding;
-	const width: number =
+	const viewBox_width: number =
 		(zig_zag_2x4_med.width + zig_zag_2x4_med.height) * 2 + spacing * 3 + padding * 2;
-	const height: number = zig_zag_2x4_med.width * 2.5 + spacing + padding * 2;
+	const viewBox_height: number = zig_zag_2x4_med.width * 2.5 + spacing + padding * 2;
 
 	const draw_scale: number = zig_zag_2x4_med.draw_scale;
 
@@ -15,7 +15,7 @@
 </script>
 
 <div class="content">
-	<svg width={width * draw_scale} height={height * draw_scale}>
+	<svg width="90%" viewBox="0 0 {viewBox_width * draw_scale} {viewBox_height * draw_scale}">
 		{#each new Array(4) as _, i}
 			<g
 				transform={`translate(
@@ -41,5 +41,7 @@
 	div.content {
 		display: flex;
 		margin: auto;
+		align-items: center;
+		justify-content: center;
 	}
 </style>

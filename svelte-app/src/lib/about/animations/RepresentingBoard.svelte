@@ -44,7 +44,7 @@
 </script>
 
 <div class="content">
-	<svg width={viewBox_width * draw_scale} height={viewBox_height * draw_scale}>
+	<svg width="90%" viewBox="0 0 {viewBox_width * draw_scale} {viewBox_height * draw_scale}">
 		<!-- Initial Piece -->
 		<Board {board} font_size="small" />
 
@@ -131,7 +131,7 @@
 			stroke-width="12"
 		/>
 	</svg>
-	<div class="katex-container" style={`animation-duration: ${duration}s;`}>
+	<div class="katex_container" style={`animation-duration: ${duration}s;`}>
 		<Katex math={get_matrix()} displayMode={false} />
 	</div>
 </div>
@@ -139,7 +139,9 @@
 <style>
 	div.content {
 		display: flex;
-		margin: auto;
+		align-items: center;
+		justify-content: center;
+		margin: 2% 5%;
 	}
 
 	svg > g > text {
@@ -244,9 +246,9 @@
 		}
 	}
 
-	div.katex-container {
-		margin: auto 0;
-		font-size: large;
+	div.katex_container {
+		margin: auto;
+		font-size: x-large;
 		position: relative;
 		animation-name: matrix-fadein;
 		animation-iteration-count: infinite;
@@ -268,6 +270,18 @@
 		}
 		100% {
 			color: rgba(255, 255, 255, 0);
+		}
+	}
+
+	@media (max-width: 760px) {
+		div.katex_container {
+			font-size: large;
+		}
+	}
+
+	@media (max-width: 480px) {
+		div.katex_container {
+			font-size: x-small;
 		}
 	}
 </style>

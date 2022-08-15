@@ -126,7 +126,7 @@
 </script>
 
 <div class="content">
-	<svg width={viewBox_size * draw_scale} height={viewBox_size * draw_scale}>
+	<svg width="50%" viewBox="0 0 {viewBox_size * draw_scale} {viewBox_size * draw_scale}">
 		<g
 			transform={`translate(
             ${(viewBox_size / 2 - width / 2 - padding) * draw_scale} 
@@ -165,6 +165,8 @@
 <style>
 	div.content {
 		display: flex;
+		align-items: center;
+		justify-content: center;
 		margin: auto;
 	}
 </style>
