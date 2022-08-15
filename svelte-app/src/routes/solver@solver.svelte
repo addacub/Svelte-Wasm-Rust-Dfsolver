@@ -78,7 +78,6 @@
 	.centred {
 		/* Center vertically and horizontally */
 		display: flex;
-		justify-content: center;
 		align-items: center;
 	}
 
@@ -91,7 +90,7 @@
 	.loading_spinner {
 		font-family: arial;
 		font-size: 24px;
-		margin: 25px;
+		margin: 0 auto;
 		padding-top: 45%;
 		padding-bottom: 10%;
 	}
@@ -110,7 +109,6 @@
 		.column {
 			/* Center vertically and horizontally */
 			display: flex;
-			justify-content: center;
 			align-items: center;
 		}
 	}

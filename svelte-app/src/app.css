@@ -8,7 +8,7 @@
 	--primary-color: #19232D;
 	--secondary-color: #19232D;
 	--tertiary-color: #19232D;
-	--accent-color: #748067;
+	--accent-color: #a6b498;
 	--heading-color: white;
 	--text-color: white;
 	--background-without-opacity: rgba(255, 255, 255, 0.7);
@@ -32,7 +32,7 @@ body::before {
 	content: '';
 	width: 80vw;
 	height: 100vh;
-	position: absolute;
+	position: fixed;
 	top: 0;
 	left: 10vw;
 	z-index: -1;
@@ -52,6 +52,8 @@ body::before {
 
 h1,
 h2,
+h3,
+li,
 p {
 	font-weight: 400;
 	color: var(--heading-color);
@@ -59,6 +61,7 @@ p {
 
 p {
 	line-height: 1.5;
+	font-size: medium;
 }
 
 label {
@@ -77,12 +80,16 @@ a:hover {
 }
 
 h1 {
-	font-size: 2rem;
+	font-size: 3rem;
 	text-align: center;
 }
 
 h2 {
-	font-size: 1rem;
+	font-size: 2rem;
+}
+
+h3 {
+	font-size: 1.5rem;
 }
 
 pre {
@@ -106,8 +113,3 @@ button:focus:not(:focus-visible) {
 	outline: none;
 }
 
-@media (min-width: 720px) {
-	h1 {
-		font-size: 2.4rem;
-	}
-}

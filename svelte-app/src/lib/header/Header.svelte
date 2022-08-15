@@ -4,18 +4,12 @@
 </script>
 
 <header>
-	<div class="corner">
-		<a href="https://kit.svelte.dev">
-			<img src={logo} alt="SvelteKit" />
-		</a>
-	</div>
-
 	<nav>
 		<svg viewBox="0 0 2 3" aria-hidden="true">
 			<path d="M0,0 L1,2 C1.5,3 1.5,3 2,3 L2,0 Z" />
 		</svg>
 		<ul>
-			<li class:active={$page.url.pathname === '/'}><a sveltekit:prefetch href="/">Play</a></li>
+			<!-- <li class:active={$page.url.pathname === '/'}><a sveltekit:prefetch href="/">Play</a></li> -->
 			<li class:active={$page.url.pathname === '/solver'}>
 				<a sveltekit:prefetch href="/solver">Solver</a>
 			</li>
@@ -27,41 +21,22 @@
 			<path d="M0,0 L0,3 C0.5,3 0.5,3 1,2 L2,0 Z" />
 		</svg>
 	</nav>
-
-	<div class="corner">
-		<a href="https://github.com/addacub">GitHub</a>
-	</div>
 </header>
 
 <style>
 	header {
-		display: flex;
-		justify-content: space-between;
-	}
-
-	.corner {
-		width: 5em;
-		height: 3em;
-	}
-
-	.corner a {
-		display: flex;
-		align-items: center;
-		justify-content: center;
+		/* background-color: var(--primary-color); */
+		position: fixed;
 		width: 100%;
-		height: 100%;
-	}
-
-	.corner img {
-		width: 2em;
-		height: 2em;
-		object-fit: contain;
+		display: flex;
+		justify-content: center;
+		z-index: 1;
 	}
 
 	nav {
 		display: flex;
 		justify-content: center;
-		--background: rgba(255, 255, 255, 0.7);
+		--background: #babdc0;
 	}
 
 	svg {
@@ -120,29 +95,5 @@
 
 	a:hover {
 		color: var(--accent-color);
-	}
-
-	@media screen and (max-height: 760px) and (orientation: landscape) {
-		svg {
-			width: 1em;
-			height: 1.5em;
-			display: block;
-		}
-
-		ul {
-			height: 1.5em;
-		}
-	}
-
-	@media screen and (max-width: 620px) and (orientation: portrait) {
-		svg {
-			width: 1.33em;
-			height: 2em;
-			display: block;
-		}
-
-		ul {
-			height: 2em;
-		}
 	}
 </style>

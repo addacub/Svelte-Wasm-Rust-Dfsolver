@@ -26,6 +26,7 @@
     "eslint": "^8.12.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-svelte3": "^4.0.0",
+    "katex": "latest",
     "prettier": "^2.5.1",
     "prettier-plugin-svelte": "^2.5.0",
     "svelte": "^3.46.0",
@@ -36,12 +37,14 @@
     "typescript": "~4.6.2",
     "vite": "^2.7.13",
     "vite-plugin-rsw": "^1.10.2",
-    "vite-plugin-wasm-pack": "^0.1.12"
+    "vite-plugin-wasm-pack": "^0.1.12",
+    "svelte-lazy": "latest"
   },
   "type": "module",
   "dependencies": {
     "@fontsource/fira-mono": "^4.5.0",
     "@lukeed/uuid": "^2.0.0",
-    "cookie": "^0.4.1"
+    "cookie": "^0.4.1",
+    "svelte-lazy": "^1.1.0"
   }
 }
