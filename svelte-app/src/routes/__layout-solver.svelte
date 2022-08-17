@@ -18,7 +18,7 @@
 		flex: 1;
 		display: flex;
 		flex-direction: column;
-		padding: 5rem 1rem 1rem 1rem;
+		padding: 5rem 1rem 1rem 2rem;
 		width: 100%;
 		max-width: fit-content;
 		margin: 0 auto;
@@ -31,17 +31,30 @@
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
-		padding: 40px;
+		padding: 10rem 0;
 	}
 
 	footer a {
 		font-weight: bold;
 	}
 
-	@media (max-height: 760px) {
+	@media (max-width: 1200px) {
 		footer {
-			padding: 0px 0;
+			padding-top: 2rem;
 			font-size: small;
+		}
+	}
+
+	@media (max-width: 620px) {
+		footer {
+			padding-top: 4rem;
+			font-size: small;
+		}
+	}
+
+	@media screen and (max-width: 620px) and (orientation: portrait) {
+		main {
+			padding: 5rem 0rem 1rem 0rem;
 		}
 	}
 </style>

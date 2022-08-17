@@ -31,16 +31,27 @@
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
-		padding: 40px;
+		padding: 5rem 0;
 	}
 
 	footer a {
 		font-weight: bold;
 	}
 
-	@media (min-width: 480px) {
+	@media (max-width: 1200px) {
+		main {
+			padding: 2rem 3rem 1rem 3rem;
+		}
+
 		footer {
-			padding: 40px 0;
+			padding: 2rem 0;
+			font-size: small;
+		}
+	}
+
+	@media (max-width: 620px) {
+		main {
+			padding: 1rem 1.5rem 1rem 1.5rem;
 		}
 	}
 </style>
