@@ -205,6 +205,7 @@
 
 	.right {
 		width: 30%;
+		padding-left: 1rem;
 	}
 
 	.left-content {
