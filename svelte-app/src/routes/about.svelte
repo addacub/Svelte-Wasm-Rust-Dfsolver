@@ -174,9 +174,9 @@
 	<h3>Full Solution</h3>
 
 	<p>
-		By taking into account the rotations and flips, each puzzle piece is actually 1 of 8 unique
-		pieces which can be placed. For example, the 2&#215;3 zig-zag has 8 unique orientations as shown
-		in Figure {get_figure_count() + 1}.
+		By taking into account rotations and flips, each puzzle piece is actually 1 of 8 unique pieces
+		which can be placed. These will be refered to as a piece's unique orientations. For example, the
+		2&#215;3 zig-zag has 8 unique orientations as shown in Figure {get_figure_count() + 1}.
 	</p>
 
 	<div class="highlight_container">
@@ -318,11 +318,11 @@
 	<p>
 		Therefore, the total number of permutations is calculated as follows:
 		<Katex
-			math={'\\begin{equation}\\boldsymbol{d} = (d_0, d_1, d_2, ..., d_N)\\end{equation}'}
+			math={'\\begin{equation}\\boldsymbol{d} = (d_0, d_1, d_2, ..., d_{L-1})\\end{equation}'}
 			displayMode={true}
 		/>
 		<Katex
-			math={'\\begin{equation} P(L, \\boldsymbol{d}) = L! \\times \\prod_{i=0}^N\\boldsymbol{d}_i \\end{equation}'}
+			math={'\\begin{equation} P(L, \\boldsymbol{d}) = L! \\times \\prod_{i=0}^{L-1}\\boldsymbol{d}_i \\end{equation}'}
 			displayMode={true}
 		/>
 
@@ -330,7 +330,10 @@
 	</p>
 	<ul>
 		<li><i>L</i>: is the total number of levels (i.e. how many pieces need to be placed).</li>
-		<li><b>d</b>: is an array of the degrees of the nodes at level <i>i</i>.</li>
+		<li>
+			<b>d</b>: is an array of the degrees of the nodes at level <i>i</i>, excluding the leaf nodes
+			(L8).
+		</li>
 	</ul>
 
 	<p>
@@ -349,10 +352,10 @@
 
 	<h3>Smart Solution</h3>
 	<p>
-		Not all of the pieces are unique as some pieces have rotational symmetry and reflection
-		symmetry. Rotational symmetry is when a shape can be rotated by <i>n</i> degrees and appear
-		unchanged. For example, in Figure {get_figure_count() + 1} the 2&#215;3 rectangular piece can be
-		rotated by 180&#176; and appear unchanged.
+		Not all of the pieces orientations are unique as some pieces have rotational symmetry and
+		reflection symmetry. Rotational symmetry is when a shape can be rotated by <i>n</i> degrees and
+		appear unchanged. For example, in Figure {get_figure_count() + 1} the 2&#215;3 rectangular piece
+		can be rotated by 180&#176; and appear unchanged.
 	</p>
 
 	<div class="highlight_container">

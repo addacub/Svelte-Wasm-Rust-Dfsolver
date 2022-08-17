@@ -19,6 +19,7 @@
 	import { solve } from 'wasm-dfsolver';
 	import { shuffle } from '$lib/solver/utils';
 	import { Circle2 } from 'svelte-loading-spinners';
+	import Counter from '$lib/solver/Counter.svelte';
 
 	let processing = false;
 
@@ -51,86 +52,116 @@
 		}, 0);
 	}
 
+	// Reactive declaration: whenever the value of selected_solution changes,
+	// the set_selected_solution() function is called
+	$: $solution_number, set_selected_solution();
+
 	function set_selected_solution(): void {
+		// Guard statement
+		if ($solution_set.length == 0) return;
+
 		selected_solution.set(shuffle($solution_set[$solution_number - 1]));
 		colour_classes.set(shuffle($colour_classes));
 	}
 </script>
 
 <div class="content">
-	<section class="row">
+	<div class="row">
 		<div class="column left">
-			<div class="slide-container">
+			<div class="left-content">
 				<p>Select how many pieces to show:</p>
-				<input bind:value={$number_of_hints} type="range" min="0" max="8" step="1" />
+				<input class="range" type="range" bind:value={$number_of_hints} min="0" max="8" step="1" />
 				<output><b>{$number_of_hints}</b></output>
 			</div>
 		</div>
-	</section>
-	<section class="row">
+
+		<div class="column right">
+			<div class="right-content" />
+		</div>
+	</div>
+	<div class="row">
 		<div class="column left">
-			<div class="spinner-container ">
+			<div class="left-content">
 				<p>Select solution to show:</p>
 				<input
-					type="number"
+					class="range"
+					type="range"
 					bind:value={$solution_number}
 					min="1"
-					max={$solution_set != undefined ? $solution_set.length : 0}
-					disabled={$solution_set == undefined}
+					max={$solution_set.length}
+					step="1"
+					disabled={$solution_set.length == 0}
 					on:change={set_selected_solution}
 				/>
-				{#if $solution_set != undefined}
+				{#if $solution_set.length > 0}
 					<p>{$solution_set.length} solutions were found.</p>
 				{:else}
 					<p>No solutions to select from.</p>
 				{/if}
 			</div>
 		</div>
-	</section>
-	<section class="row">
+		<div class="column right">
+			<div class="right-content">
+				<Counter max={$solution_set.length} />
+			</div>
+		</div>
+	</div>
+	<div class="row">
 		<div class="column left ">
-			<label for="checkbox_1">Cover dates when piece is revealed?</label>
+			<div class="left-content">
+				<label for="checkbox_1">Cover dates when piece is revealed?</label>
+			</div>
 		</div>
 		<div class="column right ">
-			<input type="checkbox" id="checkbox_1" bind:checked={$hide_text} />
+			<div class="right-content">
+				<input type="checkbox" id="checkbox_1" bind:checked={$hide_text} />
+			</div>
 		</div>
-	</section>
-	<section class="row">
+	</div>
+	<div class="row">
 		<div class="column left ">
-			<button
-				type="button"
-				disabled={$selected_day == undefined || $selected_month == undefined || processing}
-				on:click={solve_click}
-			>
-				Solve!
-			</button>
-			{#if $selected_day == undefined || !selected_month == undefined}
-				<p>Select a day and month to solve for.</p>
-			{/if}
+			<div class="left-content" style="height: 70px;">
+				<div class="centre padding-top">
+					<button
+						type="button"
+						disabled={$selected_day == undefined || $selected_month == undefined || processing}
+						on:click={solve_click}
+					>
+						Solve!
+					</button>
+				</div>
+
+				{#if $selected_day == undefined || !selected_month == undefined}
+					<p>Select a day and month to solve for.</p>
+				{/if}
+			</div>
 		</div>
 		<div class="column right " style="display:block">
-			{#if processing}
-				<Circle2 size="60" unit="px" />
-			{/if}
+			<div class="right-content" style="height: 70px;">
+				<div class="centre loading-spinner">
+					{#if processing}
+						<Circle2 size="60" unit="px" />
+					{/if}
+				</div>
+			</div>
 		</div>
-	</section>
+	</div>
 </div>
 
 <style>
-	div {
-		float: left;
-	}
-
 	input {
 		display: block;
 		margin: auto;
 	}
 
 	input[type='checkbox'] {
-		position: relative;
-		top: 50%;
-		width: 20px;
-		height: 20px;
+		width: 1.5rem;
+		height: 1.5rem;
+	}
+
+	input[type='range'] {
+		width: 10rem;
+		height: 1.5rem;
 	}
 
 	output {
@@ -142,16 +173,15 @@
 
 	button {
 		display: inline;
-		margin-right: 1rem;
 		background-color: #c8adc0;
 		width: 6em;
 		font-size: xx-large;
-		border-width: 5px;
-		border-color: white rgb(110, 110, 110) rgb(110, 110, 110) white;
+		border: 0;
+		border-radius: 3px;
 	}
 
 	button:active {
-		border-color: rgb(110, 110, 110) white white rgb(110, 110, 110);
+		transform: translateY(4px);
 	}
 
 	button:hover {
@@ -165,6 +195,8 @@
 
 	.column {
 		float: left;
+		height: 100%;
+		margin: auto;
 	}
 
 	.left {
@@ -175,11 +207,33 @@
 		width: 30%;
 	}
 
-	.content {
-		height: fit-content;
+	.left-content {
+		text-align: center;
 	}
 
-	@media screen and (max-height: 760px) and (orientation: landscape) {
+	.right-content {
+		display: flex;
+		float: left;
+		margin: 0;
+	}
+
+	.padding-top {
+		padding-top: 1rem;
+	}
+
+	.centre {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin: auto;
+	}
+
+	.content {
+		float: left;
+		width: 100%;
+	}
+
+	@media screen and (max-height: 760px) {
 		.row {
 			padding-bottom: 10%;
 		}
@@ -193,14 +247,6 @@
 		}
 
 		input[type='range'] {
-			width: fit-content;
-			height: fit-content;
-			font-size: x-small;
-		}
-
-		input[type='number'] {
-			width: fit-content;
-			height: fit-content;
 			font-size: x-small;
 		}
 
@@ -219,6 +265,10 @@
 
 		output {
 			font-size: small;
+		}
+
+		.loading-spinner {
+			transform: scale(0.6);
 		}
 	}
 

@@ -41,14 +41,14 @@
 
 {#if !is_critical_error && $is_wasm_asset_fetched}
 	<div class="content centred">
-		<section class="row">
+		<div class="row">
 			<div class="column left">
 				<Menu />
 			</div>
 			<div class="column right">
 				<Calendar />
 			</div>
-		</section>
+		</div>
 	</div>
 {:else if !is_critical_error && !$is_wasm_asset_fetched}
 	<div class="loading_spinner centred">
@@ -68,6 +68,7 @@
 	}
 
 	.left {
+		width: 300px;
 		margin-right: 6rem;
 	}
 

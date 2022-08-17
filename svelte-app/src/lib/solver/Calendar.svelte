@@ -222,6 +222,7 @@
 		width: 7rem;
 		height: 7rem;
 		font-size: 2rem;
+		color: black;
 	}
 
 	.calendar button:hover {
@@ -284,6 +285,7 @@
 			width: 2.5rem;
 			height: 2.5rem;
 			font-size: 0.8rem;
+			border-width: 0.1rem;
 		}
 	}
 
@@ -299,6 +301,7 @@
 		.calendar button {
 			width: 2.5rem;
 			height: 2.5rem;
+			border-width: 0.1rem;
 			font-size: 0.8rem;
 		}
 	}
