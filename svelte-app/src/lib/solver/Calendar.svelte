@@ -223,6 +223,8 @@
 		height: 7rem;
 		font-size: 2rem;
 		color: black;
+		text-align: center;
+		padding: 0;
 	}
 
 	.calendar button:hover {

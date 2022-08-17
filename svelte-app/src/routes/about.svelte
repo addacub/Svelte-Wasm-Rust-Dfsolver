@@ -81,13 +81,14 @@
 	<h2>Representing the Problem</h2>
 
 	<p>
-		The board and the puzzle pieces are represented within the code as <Katex
-			math={'M \\times N'}
-			displayMode={false}
-		/> matrices where <Katex math={'M'} displayMode={false} /> is the number of rows and <Katex
+		The board and the puzzle pieces are represented within the code as
+		<Katex math={'M \\times N'} displayMode={false} />
+		matrices where
+		<Katex math={'M'} displayMode={false} /> is the number of rows and <Katex
 			math={'N'}
 			displayMode={false}
-		/> is the number of columns. The elements of the matrix are used to represent the shape of a puzzle
+		/>
+		is the number of columns. The elements of the matrix are used to represent the shape of a puzzle
 		piece and the board with 0's representing holes and 1's representing filled spaces. An example of
 		how a puzzle piece is represented as a matrix is shown in Figure {get_figure_count() + 1}.
 	</p>
@@ -338,11 +339,13 @@
 
 	<p>
 		Therefore, the total number of permutations calculated using equations (1) and (2) is:
-		<Katex math={'\\boldsymbol{d} = (8, 8, 8, 8, 8, 8, 8, 8)'} displayMode={true} />
-		<Katex
-			math={'\\begin{equation} \\notag \\begin{split} P(8, \\boldsymbol{d}) &= 8! \\times \\prod_{i=0}^7\\boldsymbol{d}_i \\\\ &= 8! \\times (8 \\times 8 \\times 8 \\times 8 \\times 8 \\times 8 \\times 8 \\times 8) \\\\ &= 6.7645734912 \\times 10^{11} \\end{split} \\end{equation}'}
-			displayMode={true}
-		/>
+		<span class="katex">
+			<Katex math={'\\boldsymbol{d} = (8, 8, 8, 8, 8, 8, 8, 8)'} displayMode={true} />
+			<Katex
+				math={'\\begin{equation} \\notag \\begin{split} P(8, \\boldsymbol{d}) &= 8! \\times \\prod_{i=0}^7\\boldsymbol{d}_i \\\\ &= 8! \\times (8 \\times 8 \\times 8 \\times 8 \\times 8 \\times 8 \\times 8 \\times 8) \\\\ &= 6.7645734912 \\times 10^{11} \\end{split} \\end{equation}'}
+				displayMode={true}
+			/>
+		</span>
 		For comparison, there are estimated to be <Katex
 			math={'2 \\times 10^{11}'}
 			displayMode={false}
@@ -452,11 +455,13 @@
 
 	<p>
 		Therefore, the total number of permutations calculated using equations (1) and (2) is:
-		<Katex math={'\\boldsymbol{d} = (2, 4, 8, 8, 8, 8, 4, 4)'} displayMode={true} />
-		<Katex
-			math={'\\begin{equation} \\notag \\begin{split} P(8, \\boldsymbol{d}) &= 8! \\times \\prod_{i=0}^7\\boldsymbol{d}_i \\\\ &= 8! \\times (2 \\times 4 \\times 8 \\times 8 \\times 8 \\times 8 \\times 4 \\times 4) \\\\ &= 2.113929216 \\times 10^{10} \\end{split} \\end{equation}'}
-			displayMode={true}
-		/>
+		<span class="katex">
+			<Katex math={'\\boldsymbol{d} = (2, 4, 8, 8, 8, 8, 4, 4)'} displayMode={true} />
+			<Katex
+				math={'\\begin{equation} \\notag \\begin{split} P(8, \\boldsymbol{d}) &= 8! \\times \\prod_{i=0}^7\\boldsymbol{d}_i \\\\ &= 8! \\times (2 \\times 4 \\times 8 \\times 8 \\times 8 \\times 8 \\times 4 \\times 4) \\\\ &= 2.113929216 \\times 10^{10} \\end{split} \\end{equation}'}
+				displayMode={true}
+			/>
+		</span>
 	</p>
 
 	<h2>Where a Piece is Placed</h2>
@@ -770,6 +775,10 @@
 
 		h2 {
 			font-size: 1.5rem;
+		}
+
+		span.katex {
+			font-size: small;
 		}
 	}
 

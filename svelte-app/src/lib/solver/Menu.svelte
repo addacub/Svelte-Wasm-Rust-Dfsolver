@@ -178,6 +178,9 @@
 		font-size: xx-large;
 		border: 0;
 		border-radius: 3px;
+		color: black;
+		text-align: center;
+		padding: 0;
 	}
 
 	button:active {
