@@ -312,7 +312,7 @@
 			orientations the next piece to be placed has. Refer to Table {get_table_count()} for the number
 			of unique orientations a piece has. Note, for clarity only a small portion of the tree is shown
 			with some nodes hidden. The structure is labelled with the terminology defined above: root node,
-			edge, parent node, child node, sub-tree, leaf node, siblings and levels</i
+			edge, parent node, child node, sub-tree, leaf node, siblings and levels.</i
 		>
 	</p>
 
@@ -394,7 +394,7 @@
 	<p>
 		Therefore, by taking into account the symmetry of the pieces, the number of permutations that
 		need to be tested is reduced. Table {get_table_count() + 1} summaries the updated number of rotations
-		and flips for each piece
+		and flips for each piece.
 	</p>
 
 	<p>
