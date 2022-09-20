@@ -8,3 +8,5 @@ Uses depth first search (implemented using a loop) to find all solutions for the
 The solver contains piece information to prevent the solver from flipping or rotating pieces which have symmetry i.e. flipping / rotating piece results in the same shape being placed. This information prevents solver from placing and checking redundent pieces.
 
 Additional checks are used to prevent the solver checking dead end solutions (i.e. when placing a piece results in unreachable holes) in an attempt to increase the speed at which a solution set is found
+
+To read more about the logic behind the solver visit www.puzzleadaysolver.com/about.
